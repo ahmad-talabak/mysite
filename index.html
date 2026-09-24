@@ -1,42 +1,64 @@
 <!DOCTYPE html>
-<html dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TALABAK STORE</title>
+<html dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TALABAK - متجرك السوداني</title>
 <style>
-body{background:#0a0a0a;color:white;text-align:center;padding:20px;font-family:sans-serif;margin:0}
-.logo{font-size:75px;font-weight:900;background:linear-gradient(90deg,#ff0080,#ff8c00,#ffee00,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 25px #ff0080);margin:30px 0}
-.sub{color:#aaa;font-size:20px}
-.search{width:90%;max-width:500px;padding:15px;border-radius:30px;border:1px solid #333;background:#1a1a1a;color:white;margin:20px 0}
-.card{background:#1a1a1a;border:1px solid #333;border-radius:20px;padding:15px}
-.price{color:#00ff88;font-size:22px;font-weight:bold}
-.btn{display:block;background:#25D366;color:white;padding:12px;border-radius:30px;text-decoration:none;font-weight:bold;margin-top:10px}
+body{background:#0a0a0a;color:#fff;font-family:sans-serif;margin:0;padding:0}
+header{background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;z-index:10}
+.logo{font-weight:bold;font-size:20px;background:linear-gradient(45deg,#ff0080,#7928ca);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.products{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:15px}
+.card{background:#1a1a1a;border:1px solid #333;border-radius:15px;overflow:hidden}
+.card img{width:100%;height:140px;object-fit:cover}
+.card .info{padding:10px}
+.price{color:#00ff88;font-weight:bold}
+.btn{width:100%;padding:10px;background:#25D366;border:0;border-radius:10px;color:white;font-weight:bold;margin-top:5px}
+.marketer{background:linear-gradient(135deg,#ff008022,#7928ca22);border:1px solid #ff008044;margin:20px 15px;padding:20px;border-radius:20px;text-align:center}
+.marketer input, .marketer textarea{width:90%;padding:12px;margin:6px;border-radius:10px;border:1px solid #333;background:#111;color:white}
+#joinBtn{background:linear-gradient(45deg,#ff0080,#7928ca);padding:14px;width:95%;border:0;border-radius:30px;color:white;font-weight:bold;font-size:16px;margin-top:10px}
 </style>
-</head>
-<body>
-<div class="logo">✨ TALABAK STORE ✨</div>
-<div class="sub">🔥 أكبر متجر في السودان 🔥</div>
-<input class="search" placeholder="ابحث هنا...">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;max-width:1000px;margin:40px auto">
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1592899677977-9bb10ba128a5?w=400" style="width:100%;border-radius:15px;height:250px;object-fit:cover">
-    <h3>iPhone 15 Pro Max</h3>
-    <p class="price">1,200,000 SDG</p>
-    <a class="btn" href="https://wa.me/249124341697?text=سلام طلبك ستور عايز اطلب iPhone 15 Pro Max">طلب واتساب 📱</a>
-  </div>
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400" style="width:100%;border-radius:15px;height:250px;object-fit:cover">
-    <h3>AirPods Pro</h3>
-    <p class="price">85,000 SDG</p>
-    <a class="btn" href="https://wa.me/249124341697?text=سلام طلبك ستور عايز اطلب AirPods">طلب واتساب 📱</a>
-  </div>
-  <div class="card">
-    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" style="width:100%;border-radius:15px;height:250px;object-fit:cover">
-    <h3>ساعة ذكية</h3>
-    <p class="price">45,000 SDG</p>
-    <a class="btn" href="https://wa.me/249124341697?text=سلام طلبك ستور عايز اطلب ساعة ذكية">طلب واتساب 📱</a>
-  </div>
+</head><body>
+<header><div class=logo>🛒 TALABAK</div><button onclick="document.getElementById('mosSec').scrollIntoView({behavior:'smooth'})" style="background:#222;color:#fff;border:1px solid #333;padding:8px 15px;border-radius:20px">💼 انضم كمسوق</button></header>
+
+<div id=products class=products></div>
+
+<div id=mosSec class=marketer>
+<h2>💼 داير تبقى مسوق وتربح؟</h2>
+<p style="color:#aaa">سجل هسي واربح عمولة على كل بيعة - التسجيل مجاني</p>
+<input id=m_name placeholder="اسمك الكامل"><br>
+<input id=m_phone placeholder="رقم الواتساب"><br>
+<input id=m_city placeholder="مدينتك"><br>
+<textarea id=m_exp placeholder="خبرتك (اختياري)"></textarea><br>
+<button id=joinBtn onclick="join()">🚀 سجل كمسوق الان</button>
+<p id=m_msg></p>
+<p style="font-size:12px;color:#666;margin-top:10px">✅ اكثر من 50 مسوق شغال معنا</p>
 </div>
-</body>
-</html>
+
+<script>
+// عرض المنتجات
+let items=JSON.parse(localStorage.getItem('talabak')||"[]");
+if(items.length==0){items=[
+{n:"ساعة ذكية",p:"25,000 SDG",img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"},
+{n:"سماعة بلوتوث",p:"15,000 SDG",img:"https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400"},
+{n:"حذاء رياضي",p:"30,000 SDG",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"}
+];}
+function renderProd(){
+document.getElementById('products').innerHTML=items.map(x=>`
+<div class=card><img src="${x.img}"><div class=info><b>${x.n}</b><br><span class=price>${x.p}</span><br><button class=btn onclick="buy('${x.n}','${x.p}')">اطلب عبر واتساب</button></div></div>
+`).join('');
+}
+function buy(n,p){let txt=`سلام طلبك: ${n} - ${p}`;window.open(`https://wa.me/249124341697?text=${encodeURIComponent(txt)}`,"_blank");}
+renderProd();
+
+// تسجيل مسوق - نفس الصفحة
+function join(){
+let name=document.getElementById('m_name').value, phone=document.getElementById('m_phone').value, city=document.getElementById('m_city').value, exp=document.getElementById('m_exp').value;
+if(!name||!phone)return alert("اكتب اسمك ورقمك");
+let data={name,phone,city,exp,date:new Date().toLocaleString()};
+let list=JSON.parse(localStorage.getItem('mosawigin')||"[]");
+list.push(data);
+localStorage.setItem('mosawigin',JSON.stringify(list));
+document.getElementById('m_msg').innerHTML="✅ تم تسجيلك! سنتواصل معك للموافقة";
+let text=`طلب مسوق جديد من المتجر الموحد 🔥%0Aالاسم: ${name}%0Aالرقم: ${phone}%0Aالمدينة: ${city}%0Aالخبرة: ${exp}`;
+setTimeout(()=>{window.open(`https://wa.me/249124341697?text=${text}`,"_blank")},800);
+}
+</script>
+</body></html>
