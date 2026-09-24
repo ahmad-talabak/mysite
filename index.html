@@ -83,4 +83,29 @@ if(which=='marketer')localStorage.setItem('lastTab','marketer'); else localStora
 }
 if(localStorage.getItem('lastTab')=='marketer')show('marketer');
 </script>
+
+<script id="SECURE_MARKETER_CHECK">
+// حماية لوحة المسوق - تظهر فقط للمعتمدين
+(function(){
+ const orig = window.openMarketerPanel || function(){};
+ window.openMarketerPanel = function(){
+   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+   let phone=localStorage.getItem('my_phone');
+   if(!db.approved.includes(phone)){
+     alert('⛔ لوحة المسوق للمسوقين المعتمدين فقط\nسجل وانتظر الموافقة');
+     return;
+   }
+   if(typeof orig === 'function' && orig.name!=='openMarketerPanel') orig();
+   let panel=document.getElementById('marketer_panel')||document.getElementById('marketerPanel');
+   if(panel) panel.style.display='block';
+ }
+ // اخفاء اجباري عند التحميل
+ setTimeout(()=>{
+   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+   let phone=localStorage.getItem('my_phone');
+   let btn=document.getElementById('b_marketer');
+   if(!db.approved.includes(phone) && btn) btn.style.display='none';
+ },800);
+})();
+</script>
 </body></html>
