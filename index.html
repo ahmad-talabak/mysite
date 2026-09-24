@@ -1,256 +1,63 @@
 <!DOCTYPE html>
-<html dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TALABAK - متجرك السوداني</title>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>متجري - أفضل المنتجات</title>
 <style>
-body{background:#0a0a0a;color:#fff;font-family:sans-serif;margin:0;padding:0}
-header{background:#111;padding:15px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;z-index:10}
-.logo{font-weight:bold;font-size:20px;background:linear-gradient(45deg,#ff0080,#7928ca);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.products{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:15px}
-.card{background:#1a1a1a;border:1px solid #333;border-radius:15px;overflow:hidden}
-.card img{width:100%;height:140px;object-fit:cover}
-.card .info{padding:10px}
-.price{color:#00ff88;font-weight:bold}
-.btn{width:100%;padding:10px;background:#25D366;border:0;border-radius:10px;color:white;font-weight:bold;margin-top:5px}
-.marketer{background:linear-gradient(135deg,#ff008022,#7928ca22);border:1px solid #ff008044;margin:20px 15px;padding:20px;border-radius:20px;text-align:center}
-.marketer input, .marketer textarea{width:90%;padding:12px;margin:6px;border-radius:10px;border:1px solid #333;background:#111;color:white}
-#joinBtn{background:linear-gradient(45deg,#ff0080,#7928ca);padding:14px;width:95%;border:0;border-radius:30px;color:white;font-weight:bold;font-size:16px;margin-top:10px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+body{background:#0a0a0a;color:#fff}
+.header{background:#111;border-bottom:1px solid #222;padding:15px;text-align:center;position:sticky;top:0;z-index:10}
+.header h1{color:#ffaa00;font-size:22px}
+.container{max-width:1100px;margin:0 auto;padding:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.card{background:#151515;border:1px solid #222;border-radius:18px;overflow:hidden}
+.card-img{height:140px;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);display:flex;align-items:center;justify-content:center;font-size:40px}
+.card-body{padding:12px}
+.card-title{font-size:14px;font-weight:700;height:36px;overflow:hidden}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{color:#ffaa00;font-weight:800}
+.badge{background:#00ff88;color:#000;font-size:10px;padding:3px 7px;border-radius:20px;font-weight:800}
+.btn{width:100%;background:#ffaa00;color:#000;border:none;padding:11px;border-radius:12px;font-weight:800;margin-top:10px;cursor:pointer}
+.search{width:100%;background:#151515;border:1px solid #222;color:#fff;padding:12px 15px;border-radius:12px;margin:12px 0}
 </style>
-</head><body>
-<div style="display:flex;gap:10px;padding:10px;background:#111;position:sticky;top:0;z-index:50;border-bottom:1px solid #222">
-<button onclick="show('store')" id=b_store style="flex:1;padding:12px;border-radius:25px;border:1px solid #ff0080;background:linear-gradient(45deg,#ff0080,#7928ca);color:#fff;font-weight:bold">🛒 المتجر</button>
-<button onclick="show('marketer')" id=b_marketer style="flex:1;padding:12px;border-radius:25px;border:1px solid #333;background:#1a1a1a;color:#aaa">📦 لوحة المسوق</button>
-</div>
-<div id=sec_store>
-
-<header><div class=logo>🛒 TALABAK</div><button onclick="document.getElementById('mosSec').scrollIntoView({behavior:'smooth'})" style="background:#222;color:#fff;border:1px solid #333;padding:8px 15px;border-radius:20px">💼 انضم كمسوق</button></header>
-
-<div id=searchWrap><div style="padding:10px 15px"><input id=search oninput="filterProd()" placeholder="🔍 ابحث عن منتج..." style="width:100%;padding:12px;border-radius:30px;border:1px solid #333;background:#1a1a1a;color:white;box-sizing:border-box"></div></div><div id=products class=products></div>
-
-<div id=mosSec class=marketer>
-<h2>💼 داير تبقى مسوق وتربح؟</h2>
-<p style="color:#aaa">سجل هسي واربح عمولة على كل بيعة - التسجيل مجاني</p>
-<input id=m_name placeholder="اسمك الكامل"><br>
-<input id=m_phone placeholder="رقم الواتساب"><br>
-<input id=m_city placeholder="مدينتك"><br>
-<textarea id=m_exp placeholder="خبرتك (اختياري)"></textarea><br>
-<button id=joinBtn onclick="join()">🚀 سجل كمسوق الان</button>
-<p id=m_msg></p>
-<p style="font-size:12px;color:#666;margin-top:10px">✅ اكثر من 50 مسوق شغال معنا</p>
-</div>
-
-<script>
-// عرض المنتجات
-let items=JSON.parse(localStorage.getItem('talabak')||"[]");
-if(items.length==0){items=[
-{n:"ساعة ذكية",p:"25,000 SDG",img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"},
-{n:"سماعة بلوتوث",p:"15,000 SDG",img:"https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400"},
-{n:"حذاء رياضي",p:"30,000 SDG",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"}
-];}
-function filterProd(){let q=document.getElementById("search").value.toLowerCase();let f=items.filter(x=>x.n.toLowerCase().includes(q));document.getElementById("products").innerHTML=f.map(x=>`<div class=card><img src="${x.img}"><div class=info><b>${x.n}</b><br><span class=price>${x.p}</span><br><button class=btn onclick="buy('${x.n}','${x.p}')">اطلب عبر واتساب</button></div></div>`).join("");}
-function renderProd(){
-document.getElementById('products').innerHTML=items.map(x=>`
-<div class=card><img src="${x.img}"><div class=info><b>${x.n}</b><br><span class=price>${x.p}</span><br><button class=btn onclick="buy('${x.n}','${x.p}')">اطلب عبر واتساب</button></div></div>
-`).join('');
-}
-function buy(n,p){let txt=`سلام طلبك: ${n} - ${p}`;window.open(`https://wa.me/249124341697?text=${encodeURIComponent(txt)}`,"_blank");}
-renderProd();
-
-// تسجيل مسوق - نفس الصفحة
-function join(){
-let name=document.getElementById('m_name').value, phone=document.getElementById('m_phone').value, city=document.getElementById('m_city').value, exp=document.getElementById('m_exp').value;
-if(!name||!phone)return alert("اكتب اسمك ورقمك");
-let data={name,phone,city,exp,date:new Date().toLocaleString()};
-let list=JSON.parse(localStorage.getItem('mosawigin')||"[]");
-list.push(data);
-localStorage.setItem('mosawigin',JSON.stringify(list));
-document.getElementById('m_msg').innerHTML="✅ تم تسجيلك! سنتواصل معك للموافقة";
-let text=`طلب مسوق جديد من المتجر الموحد 🔥%0Aالاسم: ${name}%0Aالرقم: ${phone}%0Aالمدينة: ${city}%0Aالخبرة: ${exp}`;
-setTimeout(()=>{window.open(`https://wa.me/249124341697?text=${text}`,"_blank")},800);
-}
-</script>
-
-</div>
-<div id=sec_marketer style="display:none">
-<iframe src="mosaweg-panel.html" style="width:100%;height:85vh;border:0;background:#0a0a0a"></iframe>
+</head>
+<body>
+<div class="header"><h1>🛒 متجري الالكتروني</h1><p>توصيل لكل السودان</p></div>
+<div class="container">
+<input id="search" class="search" placeholder="🔍 ابحث..." oninput="filterProducts()">
+<div id="products" class="grid"><div style="text-align:center;padding:40px">جاري التحميل...</div></div>
 </div>
 <script>
-function show(which){
-document.getElementById('sec_store').style.display=which=='store'?'block':'none';
-document.getElementById('sec_marketer').style.display=which=='marketer'?'block':'none';
-document.getElementById('b_store').style.background=which=='store'?'linear-gradient(45deg,#ff0080,#7928ca)':'#1a1a1a';
-document.getElementById('b_marketer').style.background=which=='marketer'?'linear-gradient(45deg,#ff0080,#7928ca)':'#1a1a1a';
-if(which=='marketer')localStorage.setItem('lastTab','marketer'); else localStorage.setItem('lastTab','store');
-}
-if(localStorage.getItem('lastTab')=='marketer')show('marketer');
-</script>
-
-<!--SECURE_START-->
-// حماية لوحة المسوق - تظهر فقط للمعتمدين
-(function(){
- const orig = window.openMarketerPanel || function(){};
- window.openMarketerPanel = function(){
-   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
-   let phone=localStorage.getItem('my_phone');
-   if(!db.approved.includes(phone)){
-     alert('⛔ لوحة المسوق للمسوقين المعتمدين فقط\nسجل وانتظر الموافقة');
-     return;
-   }
-   if(typeof orig === 'function' && orig.name!=='openMarketerPanel') orig();
-   let panel=document.getElementById('marketer_panel')||document.getElementById('marketerPanel');
-   if(panel) panel.style.display='block';
- }
- // اخفاء اجباري عند التحميل
- setTimeout(()=>{
-   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
-   let phone=localStorage.getItem('my_phone');
-   let btn=document.getElementById('b_marketer');
-   if(!db.approved.includes(phone) && btn) btn.style.display='none';
- },800);
-})();
-
-<script>
-// نظام المسوقين الصحيح
-function checkAuth(){
- let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
- let phone=localStorage.getItem('my_phone');
- let btn=document.getElementById('b_marketer');
- let joinBox=document.getElementById('join_marketer_box');
- if(!btn) return;
- if(db.approved.includes(phone)){
-   btn.style.display='block';
-   if(joinBox) joinBox.style.display='none';
- }else{
-   btn.style.display='none';
-   if(db.pending.some(p=>p.phone==phone) && joinBox){
-     joinBox.innerHTML='<div style="background:#111;border:1px dashed #ffaa00;padding:15px;border-radius:15px;text-align:center">⏳ طلبك قيد المراجعة<br>سنتواصل معك قريبا</div>';
-   }
- }
-}
-function openMarketerPanel(){
- let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
- let phone=localStorage.getItem('my_phone');
- if(!db.approved.includes(phone)){
-   alert('للمعتمدين فقط - انتظر موافقة الادمن');
-   return;
- }
- let p=document.getElementById('marketer_panel')||document.getElementById('marketerPanel');
- if(p) p.style.display='block';
- else alert('لوحة المسوق: ارباحك\n'+phone);
-}
-setInterval(checkAuth,1000);
-setTimeout(checkAuth,500);
-
-<script>
-// نظام المسوقين الصحيح
-function checkAuth(){
- let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
- let phone=localStorage.getItem('my_phone');
- let btn=document.getElementById('b_marketer');
- let joinBox=document.getElementById('join_marketer_box');
- if(!btn) return;
- if(db.approved.includes(phone)){
-   btn.style.display='block';
-   if(joinBox) joinBox.style.display='none';
- }else{
-   btn.style.display='none';
-   if(db.pending.some(p=>p.phone==phone) && joinBox){
-     joinBox.innerHTML='<div style="background:#111;border:1px dashed #ffaa00;padding:15px;border-radius:15px;text-align:center">⏳ طلبك قيد المراجعة<br>سنتواصل معك قريبا</div>';
-   }
- }
-}
-function openMarketerPanel(){
- let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
- let phone=localStorage.getItem('my_phone');
- if(!db.approved.includes(phone)){
-   alert('للمعتمدين فقط - انتظر موافقة الادمن');
-   return;
- }
- let p=document.getElementById('marketer_panel')||document.getElementById('marketerPanel');
- if(p) p.style.display='block';
- else alert('لوحة المسوق: ارباحك\n'+phone);
-}
-setInterval(checkAuth,1000);
-setTimeout(checkAuth,500);
-</script>
-
-<script>
-// ربط المنتجات بلوحة التسعير
-(function(){
- function loadAdminProducts(){
-  try{
-   let prods = JSON.parse(localStorage.getItem('site_products')||localStorage.getItem('products_db')||'[]');
-   if(!prods.length) return;
-   // دور على مكان المنتجات في الصفحة
-   let container = document.querySelector('#products') || document.querySelector('.products') || document.querySelector('[id*=product]');
-   if(!container){
-     // لو ما لقى حاوية، انشئ قائمة
-     console.log('منتجات الادمن:', prods);
-     return;
-   }
-   container.innerHTML = prods.map(p=>`
-    <div class="product-card" style="background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px">
-     <h3>${p.name}</h3>
-     <div style="color:#888">السعر: <b style="color:#fff">${p.sell} جنيه</b></div>
-     <div id="comm_${p.id}" style="display:none;color:#00ff88;font-size:12px">عمولتك: ${p.comm} جنيه</div>
-     <button onclick="shareProduct(${p.id})" style="background:#222;color:#fff;border:none;padding:8px 12px;border-radius:10px;margin-top:8px;width:100%">مشاركة كمسوق</button>
-     <button onclick="orderNow('${p.name}')" style="background:#ffaa00;color:#000;border:none;padding:8px 12px;border-radius:10px;margin-top:5px;width:100%;font-weight:700">طلب الان</button>
-    </div>
-   `).join('');
-   // اظهر العمولة للمسوقين المعتمدين فقط
-   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
-   let phone=localStorage.getItem('my_phone');
-   if(db.approved.includes(phone)){
-     prods.forEach(p=>{
-       let el=document.getElementById('comm_'+p.id);
-       if(el) el.style.display='block';
-     });
-   }
-  }catch(e){console.log(e)}
- }
- setTimeout(loadAdminProducts,800);
- setInterval(loadAdminProducts,2000);
-
- window.shareProduct = function(id){
-   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
-   let phone=localStorage.getItem('my_phone');
-   if(!db.approved.includes(phone)) return alert('للمعتمدين فقط');
-   let prods=JSON.parse(localStorage.getItem('site_products')||'[]');
-   let p=prods.find(x=>x.id==id);
-   let link=location.origin+location.pathname+'?ref='+phone+'&product='+id;
-   navigator.clipboard.writeText(`🔥 ${p.name} بسعر ${p.sell} جنيه\nاطلب الان: ${link}`);
-   alert('تم نسخ رابط التسويق!\n'+link);
- }
- window.orderNow = function(name){
-   let phone=localStorage.getItem('my_phone')||'';
-   let msg=`مرحبا طلباك\nالمنتج: ${name}`;
-   window.open('https://wa.me/249XXXXXXXXX?text='+encodeURIComponent(msg));
- }
-})();
-</script>
-
-<script>
-// قراءة المنتجات من products.json اتوماتيك
-async function loadGlobalProducts(){
+let allProducts=[];
+async function load(){
  try{
   let res=await fetch('./products.json?v='+Date.now());
-  let prods=await res.json();
-  if(!prods.length) return;
-  let container=document.querySelector('#products')||document.querySelector('.products');
-  if(!container) return;
-  container.innerHTML=prods.map(p=>`
-    <div class="product-card" style="background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px">
-     <h3>${p.name}</h3>
-     <div style="color:#888">السعر: <b style="color:#fff">${p.sell} جنيه</b></div>
-     <div id="comm_${p.id}" style="display:none;color:#00ff88;font-size:12px">عمولتك: ${p.comm} | ربحك: ${p.profit}</div>
-     <button onclick="shareProduct(${p.id})" style="background:#222;color:#fff;border:none;padding:8px;border-radius:10px;margin-top:8px;width:100%">مشاركة</button>
-     <button onclick="orderNow('${p.name}')" style="background:#ffaa00;color:#000;border:none;padding:8px;border-radius:10px;margin-top:5px;width:100%;font-weight:700">طلب الان</button>
-    </div>`).join('');
- }catch(e){console.log('لا يوجد products.json بعد')}
+  allProducts=await res.json();
+  render(allProducts);
+ }catch(e){document.getElementById('products').innerHTML='لا يوجد منتجات بعد';}
 }
-loadGlobalProducts();
+function render(list){
+ if(!list.length){document.getElementById('products').innerHTML='لا يوجد منتجات';return;}
+ document.getElementById('products').innerHTML=list.map(p=>`
+  <div class="card">
+   <div class="card-img">📦</div>
+   <div class="card-body">
+    <div class="card-title">${p.name}</div>
+    <div class="price-row"><span class="price">${p.sell} ج</span><span class="badge">متوفر</span></div>
+    <button class="btn" onclick="order('${p.name.replace(/'/g,"\\'")}',${p.sell})">اطلب واتساب</button>
+   </div>
+  </div>`).join('');
+}
+function filterProducts(){
+ let q=document.getElementById('search').value.toLowerCase();
+ render(allProducts.filter(p=>p.name.toLowerCase().includes(q)));
+}
+function order(name,price){
+ let msg=`مرحبا اريد ${encodeURIComponent(name)} بسعر ${price}`;
+ window.open(`https://wa.me/249000000000?text=${msg}`,'_blank');
+}
+load();
 </script>
 </body>
-</body>
-
-
 </html>
