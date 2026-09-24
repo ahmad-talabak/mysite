@@ -1,16 +1,39 @@
-const API = "https://crudcrud.com/api/b4a5c6d7e8f94a1b2c3d4e5f6a7b8c9d";
-export const db = API;
-export async function saveMerchant(data){
-  let r = await fetch(API+"/merchants",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-  return await r.json();
+const API = "https://talabak-9dc1a-54707-default-rtdb.firebaseio.com";
+
+async function getAll(path){
+  let r = await fetch(`${API}/${path}.json`);
+  let data = await r.json();
+  if(!data) return [];
+  return Object.keys(data).map(k=> ({...data[k], _id: k, id: k }));
 }
-export async function getMerchants(){
-  let r = await fetch(API+"/merchants");
-  return await r.json();
+async function create(path, obj){
+  let r = await fetch(`${API}/${path}.json`, {
+    method: "POST",
+    body: JSON.stringify(obj)
+  });
+  let d = await r.json();
+  return {...obj, _id: d.name, id: d.name};
 }
-export async function updateMerchant(id,data){
-  await fetch(API+"/merchants/"+id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+async function update(path, id, obj){
+  await fetch(`${API}/${path}/${id}.json`, {
+    method: "PATCH",
+    body: JSON.stringify(obj)
+  });
 }
-export async function deleteMerchant(id){
-  await fetch(API+"/merchants/"+id,{method:"DELETE"});
+async function del(path, id){
+  await fetch(`${API}/${path}/${id}.json`, {method: "DELETE"});
 }
+
+const FirebaseDB = {
+  async createStore(s){ return create("stores", s); },
+  async getStores(){ return getAll("stores"); },
+  async updateStore(id,s){ return update("stores", id, s); },
+  async deleteStore(id){ return del("stores", id); },
+  async createProduct(p){ return create("products", p); },
+  async getProducts(){ return getAll("products"); },
+  async getProductsByStore(sid){ 
+    let all = await getAll("products");
+    return all.filter(p=>p.storeId===sid);
+  },
+  async deleteProduct(id){ return del("products", id); }
+};
