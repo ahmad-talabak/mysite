@@ -139,6 +139,39 @@ function openMarketerPanel(){
 }
 setInterval(checkAuth,1000);
 setTimeout(checkAuth,500);
+
+<script>
+// نظام المسوقين الصحيح
+function checkAuth(){
+ let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+ let phone=localStorage.getItem('my_phone');
+ let btn=document.getElementById('b_marketer');
+ let joinBox=document.getElementById('join_marketer_box');
+ if(!btn) return;
+ if(db.approved.includes(phone)){
+   btn.style.display='block';
+   if(joinBox) joinBox.style.display='none';
+ }else{
+   btn.style.display='none';
+   if(db.pending.some(p=>p.phone==phone) && joinBox){
+     joinBox.innerHTML='<div style="background:#111;border:1px dashed #ffaa00;padding:15px;border-radius:15px;text-align:center">⏳ طلبك قيد المراجعة<br>سنتواصل معك قريبا</div>';
+   }
+ }
+}
+function openMarketerPanel(){
+ let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+ let phone=localStorage.getItem('my_phone');
+ if(!db.approved.includes(phone)){
+   alert('للمعتمدين فقط - انتظر موافقة الادمن');
+   return;
+ }
+ let p=document.getElementById('marketer_panel')||document.getElementById('marketerPanel');
+ if(p) p.style.display='block';
+ else alert('لوحة المسوق: ارباحك\n'+phone);
+}
+setInterval(checkAuth,1000);
+setTimeout(checkAuth,500);
 </script>
 </body>
+
 </html>
