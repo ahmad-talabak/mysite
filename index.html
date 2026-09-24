@@ -172,6 +172,62 @@ function openMarketerPanel(){
 setInterval(checkAuth,1000);
 setTimeout(checkAuth,500);
 </script>
+
+<script>
+// ربط المنتجات بلوحة التسعير
+(function(){
+ function loadAdminProducts(){
+  try{
+   let prods = JSON.parse(localStorage.getItem('site_products')||localStorage.getItem('products_db')||'[]');
+   if(!prods.length) return;
+   // دور على مكان المنتجات في الصفحة
+   let container = document.querySelector('#products') || document.querySelector('.products') || document.querySelector('[id*=product]');
+   if(!container){
+     // لو ما لقى حاوية، انشئ قائمة
+     console.log('منتجات الادمن:', prods);
+     return;
+   }
+   container.innerHTML = prods.map(p=>`
+    <div class="product-card" style="background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px">
+     <h3>${p.name}</h3>
+     <div style="color:#888">السعر: <b style="color:#fff">${p.sell} جنيه</b></div>
+     <div id="comm_${p.id}" style="display:none;color:#00ff88;font-size:12px">عمولتك: ${p.comm} جنيه</div>
+     <button onclick="shareProduct(${p.id})" style="background:#222;color:#fff;border:none;padding:8px 12px;border-radius:10px;margin-top:8px;width:100%">مشاركة كمسوق</button>
+     <button onclick="orderNow('${p.name}')" style="background:#ffaa00;color:#000;border:none;padding:8px 12px;border-radius:10px;margin-top:5px;width:100%;font-weight:700">طلب الان</button>
+    </div>
+   `).join('');
+   // اظهر العمولة للمسوقين المعتمدين فقط
+   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+   let phone=localStorage.getItem('my_phone');
+   if(db.approved.includes(phone)){
+     prods.forEach(p=>{
+       let el=document.getElementById('comm_'+p.id);
+       if(el) el.style.display='block';
+     });
+   }
+  }catch(e){console.log(e)}
+ }
+ setTimeout(loadAdminProducts,800);
+ setInterval(loadAdminProducts,2000);
+
+ window.shareProduct = function(id){
+   let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+   let phone=localStorage.getItem('my_phone');
+   if(!db.approved.includes(phone)) return alert('للمعتمدين فقط');
+   let prods=JSON.parse(localStorage.getItem('site_products')||'[]');
+   let p=prods.find(x=>x.id==id);
+   let link=location.origin+location.pathname+'?ref='+phone+'&product='+id;
+   navigator.clipboard.writeText(`🔥 ${p.name} بسعر ${p.sell} جنيه\nاطلب الان: ${link}`);
+   alert('تم نسخ رابط التسويق!\n'+link);
+ }
+ window.orderNow = function(name){
+   let phone=localStorage.getItem('my_phone')||'';
+   let msg=`مرحبا طلباك\nالمنتج: ${name}`;
+   window.open('https://wa.me/249XXXXXXXXX?text='+encodeURIComponent(msg));
+ }
+})();
+</script>
 </body>
+
 
 </html>
