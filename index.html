@@ -25,7 +25,7 @@ grid.innerHTML=f.map((p,i)=>`<div class="prod"><img src="${p.img||'https://via.p
 }
 function add(i){cart.push(all[i]);upd();}
 function upd(){if(!cart.length){cartBar.style.display='none';return;}cartBar.style.display='flex';cText.innerText=`🛒 ${cart.length} منتج - ${cart.reduce((s,x)=>s+parseInt(x.sell||x.price),0)}ج`;}
-function order(){let t=cart.reduce((s,x)=>s+parseInt(x.sell||x.price),0);let l=cart.map(x=>`• ${x.name} - ${x.price}ج (${x.shopName||''})`).join('%0A');let m=`طلب من طلبك%0A%0A${l}%0A%0Aالاجمالي: ${t}ج`;window.open(`https://wa.me/249000000000?text=${m}`,'_blank');cart=[];upd();}
+function order(){let t=cart.reduce((s,x)=>s+parseInt(x.sell||x.price),0);let l=cart.map(x=>`• ${x.name} - ${x.price}ج (${x.shopName||''})`).join('%0A');let m=`طلب من طلبك%0A%0A${l}%0A%0Aالاجمالي: ${t}ج`;window.open(`https://wa.me/249124341697?text=${m}`,'_blank');cart=[];upd();}
 load();
 </script>
 </body></html>
