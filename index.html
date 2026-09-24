@@ -16,6 +16,12 @@ header{background:#111;padding:15px;display:flex;justify-content:space-between;a
 #joinBtn{background:linear-gradient(45deg,#ff0080,#7928ca);padding:14px;width:95%;border:0;border-radius:30px;color:white;font-weight:bold;font-size:16px;margin-top:10px}
 </style>
 </head><body>
+<div style="display:flex;gap:10px;padding:10px;background:#111;position:sticky;top:0;z-index:50;border-bottom:1px solid #222">
+<button onclick="show('store')" id=b_store style="flex:1;padding:12px;border-radius:25px;border:1px solid #ff0080;background:linear-gradient(45deg,#ff0080,#7928ca);color:#fff;font-weight:bold">🛒 المتجر</button>
+<button onclick="show('marketer')" id=b_marketer style="flex:1;padding:12px;border-radius:25px;border:1px solid #333;background:#1a1a1a;color:#aaa">📦 لوحة المسوق</button>
+</div>
+<div id=sec_store>
+
 <header><div class=logo>🛒 TALABAK</div><button onclick="document.getElementById('mosSec').scrollIntoView({behavior:'smooth'})" style="background:#222;color:#fff;border:1px solid #333;padding:8px 15px;border-radius:20px">💼 انضم كمسوق</button></header>
 
 <div id=searchWrap><div style="padding:10px 15px"><input id=search oninput="filterProd()" placeholder="🔍 ابحث عن منتج..." style="width:100%;padding:12px;border-radius:30px;border:1px solid #333;background:#1a1a1a;color:white;box-sizing:border-box"></div></div><div id=products class=products></div>
@@ -61,5 +67,20 @@ document.getElementById('m_msg').innerHTML="✅ تم تسجيلك! سنتواص�
 let text=`طلب مسوق جديد من المتجر الموحد 🔥%0Aالاسم: ${name}%0Aالرقم: ${phone}%0Aالمدينة: ${city}%0Aالخبرة: ${exp}`;
 setTimeout(()=>{window.open(`https://wa.me/249124341697?text=${text}`,"_blank")},800);
 }
+</script>
+
+</div>
+<div id=sec_marketer style="display:none">
+<iframe src="mosaweg-panel.html" style="width:100%;height:85vh;border:0;background:#0a0a0a"></iframe>
+</div>
+<script>
+function show(which){
+document.getElementById('sec_store').style.display=which=='store'?'block':'none';
+document.getElementById('sec_marketer').style.display=which=='marketer'?'block':'none';
+document.getElementById('b_store').style.background=which=='store'?'linear-gradient(45deg,#ff0080,#7928ca)':'#1a1a1a';
+document.getElementById('b_marketer').style.background=which=='marketer'?'linear-gradient(45deg,#ff0080,#7928ca)':'#1a1a1a';
+if(which=='marketer')localStorage.setItem('lastTab','marketer'); else localStorage.setItem('lastTab','store');
+}
+if(localStorage.getItem('lastTab')=='marketer')show('marketer');
 </script>
 </body></html>
