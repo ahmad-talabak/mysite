@@ -19,30 +19,30 @@ input{width:100%;background:#000;border:1px solid #333;color:#fff;padding:10px;b
 </style>
 </head>
 <body>
-<h2>🔒 لوحة الادمن - التحكم في التسعير</h2>
+<h2>🔒 لوحة الادمن - التسعير</h2>
 
 <div class="card">
 <h3>➕ اضافة منتج</h3>
 <input id="p_name" placeholder="اسم المنتج">
 <div class="grid">
-<input id="p_cost" type="number" placeholder="سعر الشراء مثلا 8000" oninput="calc()">
-<input id="p_sell" type="number" placeholder="سعر البيع 18000" oninput="calc()">
+<input id="p_cost" type="number" placeholder="سعر الشراء" oninput="calc()">
+<input id="p_sell" type="number" placeholder="سعر البيع" oninput="calc()">
 </div>
 <div class="grid">
-<input id="p_comm" type="number" placeholder="عمولة المسوق 2000" oninput="calc()">
+<input id="p_comm" type="number" placeholder="عمولة المسوق" oninput="calc()">
 <div style="padding:10px">ربحك: <span id="calc_profit" class="profit">0</span></div>
 </div>
-<button class="btn" onclick="addProduct()">حفظ المنتج</button>
+<button class="btn" onclick="addProduct()">حفظ محلي</button>
+</div>
+
+<div class="card">
+<button id="pubBtn" class="btn" onclick="publishAuto()" style="background:#00ff88;color:#000">📢 نشر اتوماتيك للجميع</button>
+<div class="small">بدوس هنا المنتج يظهر لكل الزباين في المتجر الرئيسي</div>
 </div>
 
 <div class="card">
 <h3>📦 منتجاتك (<span id="count">0</span>)</h3>
 <div id="products_list"></div>
-</div>
-
-<div class="card">
-<h3>👥 المسوقين</h3>
-<div id="marketers_list"></div>
 </div>
 
 <script>
@@ -57,32 +57,13 @@ function addProduct(){
  let prod={id:Date.now(),name:name,cost:+p_cost.value||0,sell:+p_sell.value||0,comm:+p_comm.value||0,profit:(+p_sell.value - +p_cost.value - +p_comm.value)};
  products.push(prod); save(); p_name.value='';p_cost.value='';p_sell.value='';p_comm.value='';calc_profit.innerText='0';
 }
-function publishAll(){
- let data=JSON.stringify(products,null,2);
- let blob=new Blob([data],{type:'application/json'});
- let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='products.json'; a.click();
- alert('نزل ملف products.json - ارفعو في GitHub عشان يظهر للجميع\n\nاو انسخ الكود ده والصقو في index.html');
- console.log(data);
- prompt('انسخ ده:', data);
-}
-function save(){localStorage.setItem('products_db', JSON.stringify(products));localStorage.setItem('site_products', JSON.stringify(products));render();}
+function save(){localStorage.setItem('products_db', JSON.stringify(products));render();}
 function del(id){if(!confirm('تحذف؟'))return;products=products.filter(p=>p.id!=id);save();}
 function edit(id){let p=products.find(x=>x.id==id);let ns=prompt('سعر البيع الجديد',p.sell);if(ns==null)return;let nc=prompt('عمولة جديدة',p.comm);p.sell=+ns;p.comm=+(nc||p.comm);p.profit=p.sell-p.cost-p.comm;save();}
 function render(){
  count.innerText=products.length;
  products_list.innerHTML=products.map(p=>`<div class="prod"><b>${p.name}</b><br><div class="grid" style="font-size:13px;margin-top:8px"><span>شراء:${p.cost}</span><span>بيع:${p.sell}</span><span>عمولة:${p.comm}</span><span class="profit">ربحك:${p.profit}</span></div><div class="grid" style="margin-top:8px"><button class="btn btn2" onclick="edit(${p.id})">تعديل</button><button class="btn btn2" onclick="del(${p.id})" style="color:#ff5555">حذف</button></div></div>`).join('')||'لا يوجد منتجات';
- let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
- marketers_list.innerHTML=`<div class="small">معلقين:${db.pending.length}</div>${db.pending.map(m=>`<div class="prod">${m.name}-${m.phone}<button class="btn" onclick="approve('${m.phone}')">قبول</button></div>`).join('')}<div class="small" style="margin-top:10px">معتمدين:${db.approved.length}</div>${db.approved.map(ph=>`<div class="small">✅ ${ph}</div>`).join('')}`;
 }
-function approve(phone){let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');db.approved.push(phone);db.pending=db.pending.filter(x=>x.phone!=phone);localStorage.setItem('marketers_db',JSON.stringify(db));render();}
-render();
-</script>
-<div class="card"><button class="btn" onclick="publishAll()" style="background:#00ff88">📢 نشر المنتجات للجميع (تحميل ملف)</button><div class="small" style="margin-top:10px">بعد التحميل، ارسل لي الملف وانا بربطو ليك يظهر لكل الناس</div></div>
-<div class="card">
-<button id="pubBtn" class="btn" onclick="publishAuto()" style="background:#00ff88;color:#000">📢 نشر اتوماتيك للجميع</button>
-<div class="small">اول مرة بطلب GitHub Token</div>
-</div>
-<script>
 async function publishAuto(){
  let token=prompt('دخل GitHub Token:', localStorage.getItem('gh_token')||'');
  if(!token) return alert('لازم التوكن');
@@ -99,11 +80,11 @@ async function publishAuto(){
    body:JSON.stringify({message:'update products',content:content,sha:sha})
   });
   let data=await res.json();
-  if(data.content){ alert('✅ اتنشر للجميع!'); }else{ alert('خطأ: '+JSON.stringify(data)); }
+  if(data.content){ alert('✅ اتنشر للجميع! خلال دقيقة بظهر في المتجر'); }else{ alert('خطأ: '+JSON.stringify(data).slice(0,200)); }
  }catch(e){ alert('خطأ: '+e.message); }
  btn.innerText='📢 نشر اتوماتيك للجميع'; btn.disabled=false;
 }
+render();
 </script>
 </body>
-
 </html>
