@@ -2,70 +2,71 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>لوحة الادمن</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الادمن - التسعير</title>
 <style>
-body{background:#050505;color:#fff;font-family:system-ui;padding:15px}
-.card{background:#111;border:1px solid #222;border-radius:15px;padding:15px;margin:10px 0}
-.btn{padding:10px 18px;border-radius:25px;border:0;font-weight:bold;cursor:pointer;margin:3px}
-.approve{background:#00ff88;color:#000}
-.reject{background:#ff0040;color:#fff}
-.pending{border-color:#ffaa00}
-.approved{border-color:#00ff88}
-h2{color:#ff0080}
+*{box-sizing:border-box;font-family:system-ui}
+body{background:#0a0a0a;color:#fff;padding:15px}
+h2{color:#ffaa00}
+.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px 0}
+input{width:100%;background:#000;border:1px solid #333;color:#fff;padding:10px;border-radius:10px;margin:5px 0}
+.btn{background:#ffaa00;color:#000;border:none;padding:10px 15px;border-radius:10px;font-weight:700;cursor:pointer;width:100%;margin:5px 0}
+.btn2{background:#222;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.profit{color:#00ff88;font-weight:700}
+.small{font-size:12px;color:#888}
+.prod{background:#1a1a1a;border-radius:12px;padding:12px;margin:8px 0;border:1px solid #2a2a2a}
 </style>
 </head>
 <body>
-<h2>لوحة تحكم طلبك - الادمن</h2>
+<h2>🔒 لوحة الادمن - التحكم في التسعير</h2>
+
 <div class="card">
-<h3>طلبات انضمام مسوقين</h3>
-<div id="pendingList">جاري التحميل...</div>
+<h3>➕ اضافة منتج</h3>
+<input id="p_name" placeholder="اسم المنتج">
+<div class="grid">
+<input id="p_cost" type="number" placeholder="سعر الشراء مثلا 8000" oninput="calc()">
+<input id="p_sell" type="number" placeholder="سعر البيع 18000" oninput="calc()">
 </div>
+<div class="grid">
+<input id="p_comm" type="number" placeholder="عمولة المسوق 2000" oninput="calc()">
+<div style="padding:10px">ربحك: <span id="calc_profit" class="profit">0</span></div>
+</div>
+<button class="btn" onclick="addProduct()">حفظ المنتج</button>
+</div>
+
 <div class="card">
-<h3>مسوقين معتمدين</h3>
-<div id="approvedList"></div>
+<h3>📦 منتجاتك (<span id="count">0</span>)</h3>
+<div id="products_list"></div>
 </div>
+
 <div class="card">
-<button class="btn" style="background:#333;color:#fff" onclick="if(confirm('تمسح كل البيانات؟')){localStorage.removeItem('marketers_db');location.reload()}">مسح قاعدة المسوقين</button>
-<button class="btn" style="background:#333;color:#fff" onclick="location.href='index.html'">رجوع للمتجر</button>
+<h3>👥 المسوقين</h3>
+<div id="marketers_list"></div>
 </div>
+
 <script>
-function getDB(){return JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}')}
-function saveDB(db){localStorage.setItem('marketers_db',JSON.stringify(db));render()}
+let products = JSON.parse(localStorage.getItem('products_db')||'[]');
+function calc(){ 
+ let c=+document.getElementById('p_cost').value||0, s=+document.getElementById('p_sell').value||0, m=+document.getElementById('p_comm').value||0;
+ document.getElementById('calc_profit').innerText = s - c - m;
+}
+function addProduct(){
+ let name=document.getElementById('p_name').value;
+ if(!name) return alert('اكتب الاسم');
+ let prod={id:Date.now(),name:name,cost:+p_cost.value||0,sell:+p_sell.value||0,comm:+p_comm.value||0,profit:(+p_sell.value - +p_cost.value - +p_comm.value)};
+ products.push(prod); save(); p_name.value='';p_cost.value='';p_sell.value='';p_comm.value='';calc_profit.innerText='0';
+}
+function save(){localStorage.setItem('products_db', JSON.stringify(products));localStorage.setItem('site_products', JSON.stringify(products));render();}
+function del(id){if(!confirm('تحذف؟'))return;products=products.filter(p=>p.id!=id);save();}
+function edit(id){let p=products.find(x=>x.id==id);let ns=prompt('سعر البيع الجديد',p.sell);if(ns==null)return;let nc=prompt('عمولة جديدة',p.comm);p.sell=+ns;p.comm=+(nc||p.comm);p.profit=p.sell-p.cost-p.comm;save();}
 function render(){
- let db=getDB();
- let pDiv=document.getElementById('pendingList');
- let aDiv=document.getElementById('approvedList');
- if(db.pending.length==0) pDiv.innerHTML='<p style=color:#777>ما في طلبات جديدة</p>';
- else pDiv.innerHTML=db.pending.map(p=>`
-  <div class="card pending">
-   <b>${p.name}</b><br>📱 ${p.phone}<br><small style=color:#777>${p.time||''}</small><br><br>
-   <button class="btn approve" onclick="approve('${p.phone}')">قبول</button>
-   <button class="btn reject" onclick="reject('${p.phone}')">رفض</button>
-   <button class="btn" style="background:#25D366;color:#fff" onclick="window.open('https://wa.me/${p.phone}')">واتساب</button>
-  </div>`).join('');
- if(db.approved.length==0) aDiv.innerHTML='<p style=color:#777>لسه ما في مسوقين</p>';
- else aDiv.innerHTML=db.approved.map(ph=>`<div class="card approved">📱 ${ph}<button class="btn reject" style="float:left" onclick="removeApproved('${ph}')">حذف</button></div>`).join('');
+ count.innerText=products.length;
+ products_list.innerHTML=products.map(p=>`<div class="prod"><b>${p.name}</b><br><div class="grid" style="font-size:13px;margin-top:8px"><span>شراء:${p.cost}</span><span>بيع:${p.sell}</span><span>عمولة:${p.comm}</span><span class="profit">ربحك:${p.profit}</span></div><div class="grid" style="margin-top:8px"><button class="btn btn2" onclick="edit(${p.id})">تعديل</button><button class="btn btn2" onclick="del(${p.id})" style="color:#ff5555">حذف</button></div></div>`).join('')||'لا يوجد منتجات';
+ let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');
+ marketers_list.innerHTML=`<div class="small">معلقين:${db.pending.length}</div>${db.pending.map(m=>`<div class="prod">${m.name}-${m.phone}<button class="btn" onclick="approve('${m.phone}')">قبول</button></div>`).join('')}<div class="small" style="margin-top:10px">معتمدين:${db.approved.length}</div>${db.approved.map(ph=>`<div class="small">✅ ${ph}</div>`).join('')}`;
 }
-function approve(phone){
- let db=getDB();
- if(!db.approved.includes(phone)) db.approved.push(phone);
- db.pending=db.pending.filter(p=>p.phone!=phone);
- saveDB(db);
- alert('تم قبول '+phone);
-}
-function reject(phone){
- if(!confirm('ترفض '+phone+' ؟')) return;
- let db=getDB();
- db.pending=db.pending.filter(p=>p.phone!=phone);
- saveDB(db);
-}
-function removeApproved(phone){
- if(!confirm('تحذف '+phone+' ؟')) return;
- let db=getDB();
- db.approved=db.approved.filter(p=>p!=phone);
- saveDB(db);
-}
+function approve(phone){let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');db.approved.push(phone);db.pending=db.pending.filter(x=>x.phone!=phone);localStorage.setItem('marketers_db',JSON.stringify(db));render();}
 render();
 </script>
 </body>
