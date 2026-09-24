@@ -1,73 +1,34 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>لوحة التحكم</title>
-<style>
-*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;padding:15px;max-width:600px;margin:0 auto}
-h2{color:#ffaa00}.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:12px 0}
-input,textarea{width:100%;background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;margin:6px 0}
-.btn{background:#ffaa00;color:#000;border:none;padding:12px;border-radius:12px;font-weight:800;width:100%;cursor:pointer;margin-top:6px}
-.btn2{background:#222;color:#fff;border:1px solid #333}
-.list-item{background:#111;border:1px solid #222;border-radius:10px;padding:10px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
-small{color:#888}
-</style></head><body>
-<h2>⚙️ لوحة التحكم - اضافة منتجات</h2>
-
-<div class="card">
-<h3>➕ اضافة منتج جديد</h3>
-<input id="name" placeholder="اسم المنتج">
-<input id="vendor" placeholder="اسم التاجر">
-<input id="cost" type="number" placeholder="سعر التاجر (8000)">
-<input id="sell" type="number" placeholder="سعر البيع (15000)">
-<input id="comm" type="number" placeholder="عمولتك (2000)">
-<button class="btn" onclick="addProduct()">✅ اضافة للمتجر</button>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>لوحة طلبك</title>
+<style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;margin:0;padding:12px}.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px 0;max-width:600px;margin:10px auto}input,select{background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;width:100%;margin:5px 0}label{color:#ffaa00;font-size:13px;font-weight:700}.btn{background:#ffaa00;color:#000;border:none;padding:12px;border-radius:10px;font-weight:900;width:100%;cursor:pointer;margin-top:8px}.prod{background:#111;border:1px solid #222;border-radius:12px;padding:10px;margin:8px 0;display:flex;gap:10px;align-items:center}.prod img{width:60px;height:60px;object-fit:cover;border-radius:8px}</style></head>
+<body>
+<div class="card"><h2 style="color:#ffaa00;margin:0">⚙️ لوحة تحكم طلبك</h2><p style="color:#888;font-size:12px">اضف منتجات مع صور</p>
+<label>اسم المنتج</label><input id="name" placeholder="ايفون 13">
+<label>اسم المحل الحقيقي</label><input id="shopName" placeholder="محلات ابوعبيدة">
+<label>السعر</label><input id="price" type="number" placeholder="500000">
+<label>التصنيف</label><select id="cat"><option>الكترونيات</option><option>ملابس</option><option>عطور</option><option>غذائية</option><option>اخرى</option></select>
+<label>رابط الصورة (انسخ رابط من فيسبوك او قوقل)</label><input id="img" placeholder="https://...jpg">
+<button class="btn" onclick="add()">➕ اضف المنتج</button>
+<button class="btn" style="background:#222;color:#fff;border:1px solid #333" onclick="download()">📥 تحميل products.json وارفعه</button>
 </div>
-
-<div class="card">
-<h3>📦 المنتجات (<span id="count">0</span>)</h3>
-<div id="list"></div>
-<button class="btn btn2" onclick="downloadJSON()">📥 تحميل products.json</button>
-<p style="color:#888;font-size:11px;margin-top:8px">بعد التحميل ارفع الملف لـ GitHub او انسخ المحتوى لـ products.json</p>
-</div>
-
-<div class="card" style="border-color:#00ff88">
-<h3>🚀 رفع تلقائي (اختياري)</h3>
-<p style="font-size:12px;color:#888">لو عندك GitHub Token الصقو هنا بيرفع تلقائي بدون كود</p>
-<input id="token" type="password" placeholder="ghp_xxxx (اتركو فاضي لو ما عندك)">
-<button class="btn" style="background:#00ff88" onclick="pushToGithub()">رفع للمتجر مباشر</button>
-<div id="status"></div>
-</div>
-
+<div class="card"><h3>المنتجات الحالية</h3><div id="list"></div></div>
 <script>
-let products = JSON.parse(localStorage.getItem('my_products')||'[]');
-function save(){localStorage.setItem('my_products',JSON.stringify(products)); render();}
-function addProduct(){
- let n=name.value.trim(), v=vendor.value.trim(), c=parseInt(cost.value), s=parseInt(sell.value), co=parseInt(comm.value)||0;
- if(!n||!s) return alert('اكتب اسم المنتج والسعر');
- products.push({id:products.length+1,name:n,vendor:v||'المتجر الرئيسي',cost:c||0,sell:s,comm:co,profit:co,t_profit:(s-(c||0)-co)});
- name.value=vendor.value=cost.value=sell.value=comm.value=''; save(); alert('✅ اتضاف!');
+let products=JSON.parse(localStorage.getItem('talabak')||'[]');
+function render(){list.innerHTML=products.map((p,i)=>`<div class="prod"><img src="${p.img||'https://via.placeholder.com/60?text=No+Img'}" onerror="this.src='https://via.placeholder.com/60'"><div><b>${p.name}</b><br><small>🏬 ${p.shopName} - ${p.price}ج</small></div><button onclick="del(${i})" style="margin-right:auto;background:#300;color:#f55;border:none;padding:6px 10px;border-radius:6px">X</button></div>`).join('');}
+function add(){
+let p={name:name.value,shopName:shopName.value,price:price.value,sell:price.value,category:cat.value,img:img.value, vendor:shopName.value};
+if(!p.name||!p.price) return alert('اكتب الاسم والسعر');
+products.push(p);localStorage.setItem('talabak',JSON.stringify(products));render();name.value='';price.value='';img.value='';
+alert('تمت الاضافة - دوس تحميل products.json');
 }
-function render(){
- count.innerText=products.length;
- list.innerHTML=products.map((p,i)=>`<div class="list-item"><div><b>${p.name}</b><br><small>🏪 ${p.vendor} - ${p.sell}ج - ربحك ${p.comm}ج</small></div><button onclick="del(${i})" style="background:#ff3333;color:#fff;border:none;padding:6px 10px;border-radius:8px">حذف</button></div>`).join('') || '<p style=color:#555>لا يوجد منتجات</p>';
-}
-function del(i){products.splice(i,1); save();}
-function downloadJSON(){
- let blob=new Blob([JSON.stringify(products,null,2)],{type:'application/json'});
- let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='products.json'; a.click();
-}
-async function pushToGithub(){
- let token=document.getElementById('token').value.trim();
- if(!token) return alert('الصق التوكن اول او استخدم التحميل اليدوي');
- status.innerHTML='جاري الرفع...';
- try{
-  let getRes=await fetch('https://api.github.com/repos/ahmad-talabak/mysite/contents/products.json',{headers:{Authorization:`token ${token}`}});
-  let sha=getRes.ok ? (await getRes.json()).sha : null;
-  let content=btoa(unescape(encodeURIComponent(JSON.stringify(products,null,2))));
-  let res=await fetch('https://api.github.com/repos/ahmad-talabak/mysite/contents/products.json',{
-   method:'PUT', headers:{Authorization:`token ${token}`,'Content-Type':'application/json'},
-   body:JSON.stringify({message:'update via admin',content,sha})
-  });
-  if(res.ok){status.innerHTML='✅ اترفع! انتظر دقيقة ويظهر في المتجر';}else{let e=await res.text(); status.innerHTML='❌ فشل: '+e;}
- }catch(e){status.innerHTML='❌ خطأ: '+e.message;}
+function del(i){products.splice(i,1);localStorage.setItem('talabak',JSON.stringify(products));render();}
+function download(){
+let blob=new Blob([JSON.stringify(products,null,2)],{type:'application/json'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='products.json';a.click();
+alert('الان ارفع الملف ده في GitHub بنفس الاسم products.json - استبدل القديم');
 }
 render();
+// حمل القديم لو موجود
+fetch('products.json').then(r=>r.json()).then(d=>{if(!products.length&&d.length){products=d;localStorage.setItem('talabak',JSON.stringify(products));render();}}).catch(()=>{});
 </script>
 </body></html>
