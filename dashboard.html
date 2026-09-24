@@ -1,0 +1,42 @@
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة التحكم - طلبك</title>
+<style>body{font-family:sans-serif;background:#f8f9fa;margin:0;padding:15px}header{background:#2e9d4a;color:white;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}.card{background:white;padding:15px;border-radius:12px;margin-top:15px;box-shadow:0 2px 6px rgba(0,0,0,.07)}.btn{padding:10px 14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}.btn-green{background:#2e9d4a;color:white}.btn-red{background:#ff4444;color:white}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.item{background:#f8f9fa;padding:10px;border-radius:8px;display:flex;gap:10px;align-items:center}.item img{width:50px;height:50px;border-radius:8px;object-fit:cover}</style></head><body>
+<header><b>لوحة التحكم - طلبك</b><a href="index.html" style="color:white;text-decoration:none">🏠 السوق</a></header>
+
+<div class="card">
+<h3 id="storeName">جاري التحميل...</h3>
+<p id="storePhone"></p>
+<div class="grid"><div><b id="count">0</b><br>منتج</div><div><b id="views">0</b><br>مشاهدة</div></div>
+<br>
+<a href="add-product.html" style="background:#2e9d4a;color:white;padding:12px;display:block;text-align:center;border-radius:10px;text-decoration:none">+ إضافة منتج جديد</a>
+</div>
+
+<div class="card">
+<h3>منتجاتي</h3>
+<div id="products">جاري التحميل...</div>
+</div>
+
+<div class="card">
+<button class="btn btn-red" onclick="logout()">تسجيل خروج</button>
+</div>
+
+<script src="firebase.js"></script>
+<script>
+async function loadDash(){
+ let user = JSON.parse(localStorage.getItem('talabak_user')||'null');
+ if(!user){ location.href='login.html'; return; }
+ let stores = await FirebaseDB.getStores();
+ let myStore = stores.find(s=>s._id===user.storeId) || stores[0];
+ if(!myStore){ document.getElementById('storeName').innerText='لم يتم انشاء متجر بعد'; return; }
+ document.getElementById('storeName').innerText='🏪 '+myStore.name;
+ document.getElementById('storePhone').innerText='📱 '+myStore.phone;
+ let prods = await FirebaseDB.getProducts();
+ let mine = prods.filter(p=>p.storeId===myStore._id);
+ document.getElementById('count').innerText=mine.length;
+ document.getElementById('products').innerHTML = mine.map(p=>`
+  <div class="item"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/100'"><div style="flex:1"><b>${p.name}</b><br><small>${p.price} SDG</small></div><button class="btn btn-red" onclick="delProd('${p._id}')">حذف</button></div>
+ `).join('') || 'لا يوجد منتجات بعد';
+}
+async function delProd(id){ if(!confirm('متأكد تحذف المنتج؟'))return; await FirebaseDB.deleteProduct(id); loadDash(); }
+function logout(){ localStorage.removeItem('talabak_user'); location.href='login.html'; }
+loadDash();
+</script></body></html>
