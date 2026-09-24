@@ -1,1 +1,31 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>متجري</title><style>*{box-sizing:border-box;font-family:system-ui}body{background:#000;color:#fff;margin:0;padding:10px}.box{max-width:600px;margin:auto}.card{background:#151515;border:1px solid #222;border-radius:12px;padding:10px;margin:8px 0}input{width:100%;padding:10px;margin:4px 0;background:#000;border:1px solid #333;border-radius:8px;color:#fff}button{padding:10px;background:#ffaa00;border:0;border-radius:8px;font-weight:800;cursor:pointer}</style></head><body><div class="box"><h2 id="shopName">متجري</h2><div class="card"><h3>اضف منتج</h3><input id="pname" placeholder="اسم المنتج"><input id="buy" type="number" placeholder="سعر الشراء"><input id="sell" type="number" placeholder="سعر البيع"><button id="add">اضف للسوق 🚀</button></div><div id="myProds"></div></div><script type="module">import{getMerchants} from './firebase.js';const API="https://crudcrud.com/api/b4a5c6d7e8f94a1b2c3d4e5f6a7b8c9d";let shop="متجري";async function init(){try{let ms=await getMerchants();if(ms.length)shop=ms[0].shopName;shopName.textContent=shop;loadProds();}catch(e){}}async function loadProds(){let r=await fetch(API+"/products");let ps=await r.json();myProds.innerHTML=ps.filter(p=>p.shopName==shop).map(p=>`<div class=card>${p.name} - ${p.sell}ج <small style=color:#0f5>ربح ${p.sell-p.buy}</small></div>`).join('')||'لا منتجات';}add.onclick=async()=>{if(!pname.value)return alert('اسم المنتج');let p={name:pname.value,buy:+buy.value,sell:+sell.value,shopName:shop,created:Date.now()};await fetch(API+"/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});pname.value='';loadProds();alert('اتضاف للسوق ✅')};init();</script></body></html>
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة التاجر</title>
+<style>body{font-family:sans-serif;padding:20px;background:#f5f5f5}input,button{padding:10px;margin:5px;width:95%}</style>
+</head><body>
+<h2>🛍️ لوحة التاجر</h2>
+<div id="storeName"></div>
+<h3>اضافة منتج</h3>
+<input id="pname" placeholder="اسم المنتج">
+<input id="pprice" type="number" placeholder="السعر">
+<input id="pimg" placeholder="رابط الصورة">
+<button onclick="addProd()">اضافة</button>
+<h3>منتجاتي</h3>
+<div id="myProds"></div>
+<script src="firebase.js"></script>
+<script>
+let sid = localStorage.getItem("storeId");
+if(!sid){ alert("سجل دخول اول"); location.href="login.html"; }
+async function load(){
+ let stores = await FirebaseDB.getStores();
+ let s = stores.find(x=>x._id===sid);
+ if(s) document.getElementById("storeName").innerHTML = "متجر: <b>"+s.name+"</b>";
+ let prods = await FirebaseDB.getProductsByStore(sid);
+ document.getElementById("myProds").innerHTML = prods.map(p=>`<div style="background:white;padding:10px;margin:5px;border-radius:8px"><img src="${p.image}" style="width:60px;height:60px;object-fit:cover"><br>${p.name} - ${p.price} جنيه <button onclick="delProd('${p._id}')">حذف</button></div>`).join("");
+}
+async function addProd(){
+ let obj={storeId:sid,name:pname.value,price:pprice.value,image:pimg.value};
+ await FirebaseDB.createProduct(obj);
+ pname.value="";pprice.value="";pimg.value=""; load();
+}
+async function delProd(id){ await FirebaseDB.deleteProduct(id); load(); }
+load();
+</script></body></html>
