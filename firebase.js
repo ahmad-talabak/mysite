@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getDatabase, ref, push, set, get, remove, child } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAYr7_SMI50nqQiEuAbjsDzXVkPSkB7qqI",
@@ -8,32 +8,30 @@ const firebaseConfig = {
   storageBucket: "talabak-9dc1a.firebasestorage.app",
   messagingSenderId: "834566781172",
   appId: "1:834566781172:web:cabde4e4d5ccfbdac146a1",
-  measurementId: "G-WTFZKB1Y8H"
+  measurementId: "G-WTFZKB1Y8H",
+  databaseURL: "https://talabak-9dc1a-default-rtdb.firebaseio.com"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 window.FirebaseDB = {
   async getProducts(){
     try{
-      const q = query(collection(db,"products"), orderBy("createdAt","desc"));
-      const snap = await getDocs(q);
-      return snap.docs.map(d=>({ _id:d.id, ...d.data() }));
+      const snap = await get(child(ref(db), 'products'));
+      if(!snap.exists()) return [];
+      const data = snap.val();
+      return Object.keys(data).map(k=>({ _id:k,...data[k] })).reverse();
     }catch(e){ console.error(e); return []; }
   },
   async addProduct(p){
-    await addDoc(collection(db,"products"), {...p, createdAt: Date.now()});
+    const newRef = push(ref(db, 'products'));
+    await set(newRef, {...p, createdAt: Date.now()});
   },
   async deleteProduct(id){
-    await deleteDoc(doc(db,"products",id));
+    await remove(ref(db, 'products/'+id));
   },
-  async getStores(){
-    const snap = await getDocs(collection(db,"stores"));
-    return snap.docs.map(d=>({ _id:d.id, ...d.data() }));
-  },
-  async addStore(s){
-    await addDoc(collection(db,"stores"), s);
-  }
+  async getStores(){ return [] },
+  async addStore(s){}
 };
-console.log("🔥 Talabak REAL Firebase connected");
+console.log("🔥 Talabak REALTIME DB connected - NO BILLING");
