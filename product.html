@@ -1,0 +1,11 @@
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>المنتج - طلبك</title>
+<style>body{font-family:sans-serif;margin:0;background:#fff}header{background:#2e9d4a;color:white;padding:12px;display:flex;justify-content:space-between;align-items:center}img.main{width:100%;height:350px;object-fit:cover}.info{padding:15px}.price{color:#2e9d4a;font-size:24px;font-weight:bold}.btn{width:100%;padding:14px;border:none;border-radius:12px;margin-top:10px;font-size:16px;font-weight:bold;cursor:pointer}.green{background:#2e9d4a;color:white}.white{border:1px solid #ddd;background:white}</style></head><body>
+<header><a href="index.html" style="color:white;text-decoration:none">← رجوع</a><b>طلبك</b><a href="cart.html" style="color:white;text-decoration:none">🛒<span id="cartCount"></span></a></header>
+<img id="pimg" class="main" src=""><div class="info"><h2 id="pname"></h2><div id="pprice" class="price"></div><p id="pdesc" style="color:#666"></p><p>🏪 <span id="pstore"></span></p>
+<button class="btn green" onclick="addToCart()">🛒 أضف للسلة</button>
+<button class="btn white" id="waBtn">💬 اطلب واتساب</button>
+</div><script src="firebase.js"></script><script src="cart.js"></script><script>
+async function load(){let id=new URLSearchParams(location.search).get('id');let prods=await FirebaseDB.getProducts();let p=prods.find(x=>x._id===id);if(!p){document.body.innerHTML='المنتج غير موجود';return}document.getElementById('pimg').src=p.image;document.getElementById('pname').innerText=p.name;document.getElementById('pprice').innerText=p.price+' SDG';document.getElementById('pdesc').innerText=p.desc||'';let stores=await FirebaseDB.getStores();let s=stores.find(x=>x._id===p.storeId);document.getElementById('pstore').innerText=s?s.name:'متجر';let phone=s?s.phone:'';document.getElementById('waBtn').onclick=()=>{location.href=`https://wa.me/${phone}?text=مرحبا عايز ${p.name} من طلبك`};window._p=p}
+function addToCart(){Cart.add(window._p)}
+load();
+</script></body></html>

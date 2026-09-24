@@ -1,6 +1,27 @@
-<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>طلبك</title>
-<style>body{font-family:sans-serif;background:#f8f9fa;margin:0}header{background:#2e9d4a;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center}header img{width:42px;height:42px;background:white;border-radius:10px;padding:3px}.top{display:flex;gap:8px;padding:12px}.top input{flex:1;padding:13px;border-radius:12px;border:1px solid #ddd;font-size:16px}.top button{padding:13px 14px;border-radius:12px;border:none;background:white;box-shadow:0 2px 5px rgba(0,0,0,.1);font-weight:bold}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;padding:12px}.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.07)}.card img{width:100%;height:130px;object-fit:cover}.card div{padding:9px}.filters{display:none;padding:0 12px 10px;gap:6px;flex-wrap:wrap}.filters button{padding:8px 12px;border-radius:20px;border:1px solid #2e9d4a;background:white;color:#2e9d4a}.filters button.active{background:#2e9d4a;color:white}</style></head><body>
-<header><div style="display:flex;align-items:center;gap:8px"><img src="logo.png" onerror="this.style.display='none'"><b>طلبك</b></div><a href="login.html" style="color:white;text-decoration:none;background:#ffffff33;padding:7px 12px;border-radius:8px">+ متجري</a></header>
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>طلبك - أفضل سوق في السودان</title>
+<style>
+*{box-sizing:border-box}body{font-family:sans-serif;background:#f4f5f7;margin:0}
+header{background:#2e9d4a;color:white;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+header img{width:38px;height:38px;background:white;border-radius:8px;padding:3px}
+.top{display:flex;gap:8px;padding:12px;background:white;box-shadow:0 1px 3px rgba(0,0,0,.05);position:sticky;top:55px;z-index:9}
+.top input{flex:1;padding:12px;border-radius:10px;border:1px solid #ddd;background:#f4f5f7}
+.top button{padding:12px 14px;border-radius:10px;border:none;background:#f4f5f7;font-weight:bold}
+.hero{padding:15px;background:linear-gradient(135deg,#2e9d4a,#3bce67);color:white;margin:12px;border-radius:16px}
+.hero h2{margin:5px 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;transition:.2s}
+.card:active{transform:scale(.97)}
+.card img{width:100%;height:160px;object-fit:cover}
+.card .info{padding:10px}
+.price{color:#2e9d4a;font-weight:bold;font-size:16px}
+.old{color:#999;text-decoration:line-through;font-size:12px;margin-right:5px}
+.badge{background:#ff3b30;color:white;font-size:10px;padding:2px 6px;border-radius:6px}
+.filters{display:none;padding:0 12px 12px;gap:6px;flex-wrap:wrap;background:white}
+.filters button{padding:8px 14px;border-radius:20px;border:1px solid #ddd;background:white}
+.filters button.active{background:#2e9d4a;color:white;border-color:#2e9d4a}
+</style></head><body>
+<header><div style="display:flex;align-items:center;gap:8px"><img src="logo.png" onerror="this.style.display='none'"><b>طلبك</b></div><div style="display:flex;gap:14px"><a href="cart.html" style="color:white;text-decoration:none">🛒<span id="cartCount" style="background:red;border-radius:50%;padding:1px 6px;font-size:12px"></span></a><a href="login.html" style="color:white;text-decoration:none">👤</a></div></header>
 <div class="top"><input id="q" oninput="doSearch()" placeholder="بحث"><button onclick="toggleOpts()">خيارات</button></div>
 <div id="filters" class="filters">
 <button onclick="filterCat('all',this)" class="active">الكل</button>
@@ -9,13 +30,17 @@
 <button onclick="filterCat('أحذية',this)">أحذية</button>
 <button onclick="filterCat('مكياج',this)">مكياج</button>
 <button onclick="filterCat('ساعات',this)">ساعات</button>
+<button onclick="filterCat('شنط',this)">شنط</button>
 </div>
-<div class="grid" id="grid"></div>
-<script src="firebase.js"></script>
-<script>
-let all=[],map={},cur='all';
-async function load(){all=await FirebaseDB.getProducts();let s=await FirebaseDB.getStores();s.forEach(x=>map[x._id]=x);render(all)}
-function render(l){grid.innerHTML=l.map(p=>{let st=map[p.storeId]||{};return `<div class="card"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/300'"><div><b>${p.name}</b><br><span style="color:#2e9d4a;font-weight:bold">${p.price} SDG</span><br><a href="https://wa.me/${st.phone||''}?text=عايز ${p.name}" target="_blank" style="background:#25D366;color:white;padding:6px;border-radius:7px;text-decoration:none;display:block;text-align:center;margin-top:6px">واتساب</a></div></div>`}).join("")||"<p style='padding:20px'>لا يوجد نتائج</p>"}
+<div class="hero"><h2>أهلاً بيك في طلبك 🛍️</h2><p style="margin:0;opacity:.9">أفضل منتجات - توصيل سريع - دفع عند الاستلام</p></div>
+<div class="grid" id="grid"><p style="padding:20px">جاري التحميل...</p></div>
+<script src="firebase.js"></script><script src="cart.js"></script><script>
+let all=[],cur='all';
+async function load(){try{all=await FirebaseDB.getProducts()}catch(e){all=[]}render(all)}
+function render(list){let g=document.getElementById('grid');if(list.length===0){g.innerHTML='<p style="grid-column:1/-1;text-align:center;padding:30px">لا يوجد منتجات<br><small>كن أول من يضيف منتج</small></p>';return}g.innerHTML=list.map(p=>`
+<div class="card" onclick="location.href='product.html?id=${p._id}'">
+<img src="${p.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=طلبك'">
+<div class="info"><div style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>${p.name}</b></div><div style="margin:4px 0"><span class="price">${p.price} SDG</span> <span class="old">${Math.round(p.price*1.3)} SDG</span></div><div style="font-size:11px;color:#666">⭐ 4.8 | تم بيع 120+</div></div></div>`).join('')}
 function doSearch(){let t=q.value.toLowerCase();let f=all.filter(p=>p.name.toLowerCase().includes(t));if(cur!=='all')f=f.filter(p=>p.name.toLowerCase().includes(cur.toLowerCase()));render(f)}
 function toggleOpts(){let e=document.getElementById('filters');e.style.display=e.style.display==='flex'?'none':'flex'}
 function filterCat(c,btn){cur=c;document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');doSearch()}

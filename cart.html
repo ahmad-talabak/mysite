@@ -1,0 +1,12 @@
+<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>السلة - طلبك</title>
+<style>body{font-family:sans-serif;background:#f8f9fa;margin:0;padding:12px}header{background:#2e9d4a;color:white;padding:12px;border-radius:12px;display:flex;justify-content:space-between}.card{background:white;padding:12px;border-radius:12px;margin-top:10px;display:flex;gap:10px;align-items:center}.card img{width:60px;height:60px;border-radius:8px;object-fit:cover}.btn{padding:12px;border:none;border-radius:10px;width:100%;margin-top:10px;font-weight:bold}.green{background:#2e9d4a;color:white}</style></head><body>
+<header><a href="index.html" style="color:white;text-decoration:none">← متابعة التسوق</a><b>السلة</b><span></span></header>
+<div id="list"></div>
+<div id="total" style="background:white;padding:15px;border-radius:12px;margin-top:15px;font-weight:bold;font-size:18px"></div>
+<button class="btn green" onclick="checkout()">✅ اتمام الطلب - واتساب</button>
+<script src="cart.js"></script><script>
+function render(){let c=Cart.get();let list=document.getElementById('list');if(c.length===0){list.innerHTML='<p style="text-align:center;padding:30px">السلة فاضية</p>';document.getElementById('total').innerText='';return}
+list.innerHTML=c.map(x=>`<div class="card"><img src="${x.image}"><div style="flex:1"><b>${x.name}</b><br>${x.price} SDG x ${x.qty}</div><button onclick="Cart.remove('${x._id}');render()">❌</button></div>`).join('');let tot=c.reduce((s,x)=>s+x.price*x.qty,0);document.getElementById('total').innerText='الاجمالي: '+tot+' SDG'}
+function checkout(){let c=Cart.get();if(c.length===0)return alert('السلة فاضية');let msg='طلب جديد من طلبك:%0A';c.forEach(x=>msg+=`- ${x.name} x${x.qty} = ${x.price*x.qty}%0A`);let tot=c.reduce((s,x)=>s+x.price*x.qty,0);msg+=`الاجمالي: ${tot} SDG`;location.href='https://wa.me/249000000000?text='+msg}
+render();
+</script></body></html>
