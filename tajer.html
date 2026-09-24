@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>لوحة التاجر - طلبك</title>
+<style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;margin:0;padding:15px}.box{max-width:500px;margin:0 auto}.card{background:#151515;border:1px solid #222;border-radius:16px;padding:20px;margin-bottom:15px}h2{color:#ffaa00;margin:0 0 5px}p{color:#888;margin:0 0 15px;font-size:13px}label{color:#aaa;font-size:12px;display:block;margin-top:10px}input{background:#000;border:1px solid #333;color:#fff;padding:14px;border-radius:12px;width:100%;margin-top:4px;font-size:15px}.btn{background:#ffaa00;color:#000;border:none;padding:15px;border-radius:12px;font-weight:900;width:100%;cursor:pointer;font-size:16px;margin-top:15px}.preview{width:100%;height:180px;background:#000;border:1px dashed #333;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-top:8px;overflow:hidden}.preview img{width:100%;height:100%;object-fit:cover}.prod{background:#111;border:1px solid #222;border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;margin:8px 0}.prod img{width:55px;height:55px;border-radius:8px;object-fit:cover}</style></head>
+<body><div class="box">
+<div class="card"><h2>🏪 لوحة التاجر</h2><p>اضف منتجك في 20 ثانية - يظهر طوالي في طلبك</p>
+<label>اسم محلك (مرة واحدة)</label><input id="shop" placeholder="مثلا: محلات ابوعبيدة امدرمان">
+<label>اسم المنتج</label><input id="name" placeholder="مثلا: سماعة بلوتوث">
+<label>السعر</label><input id="price" type="number" placeholder="15000">
+<label>صورة المنتج من الاستديو</label><input type="file" id="file" accept="image/*" onchange="loadImg(this)">
+<div class="preview" id="prev">📸 الصورة ح تظهر هنا</div>
+<button class="btn" onclick="publish()">🚀 انشر في طلبك الان</button>
+<div style="text-align:center;margin-top:10px"><a href="index.html" style="color:#666;font-size:13px">👁️ شوف موقع طلبك</a></div>
+</div>
+<div class="card"><h3 style="margin:0 0 10px">📦 منتجاتك</h3><div id="list"></div></div>
+</div>
+<script>
+let imgData='';
+function loadImg(input){let r=new FileReader();r.onload=e=>{imgData=e.target.result;prev.innerHTML=`<img src="${imgData}">`;};r.readAsDataURL(input.files[0]);}
+let all=JSON.parse(localStorage.getItem('talabak_products')||'[]');
+let shopSaved=localStorage.getItem('talabak_shop')||'';if(shopSaved) shop.value=shopSaved;
+function render(){list.innerHTML=all.length?all.map((p,i)=>`<div class="prod"><img src="${p.img}"><div><b>${p.name}</b><br><small>${p.price}ج</small></div><button onclick="del(${i})" style="margin-right:auto;background:#222;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:8px">حذف</button></div>`).join(''):'<p style=color:#555;text-align:center>لسه ما اضفت منتجات</p>';}
+function publish(){
+if(!name.value||!price.value) return alert('اكتب اسم المنتج والسعر');
+if(!imgData) return alert('اختار صورة');
+localStorage.setItem('talabak_shop',shop.value);
+let p={name:name.value,shopName:shop.value||'تاجر طلبك',price:price.value,sell:price.value,img:imgData,date:Date.now()};
+all.unshift(p);localStorage.setItem('talabak_products',JSON.stringify(all));
+let globalProducts=JSON.parse(localStorage.getItem('talabak_global')||'[]');globalProducts.unshift(p);localStorage.setItem('talabak_global',JSON.stringify(globalProducts));
+name.value='';price.value='';file.value='';imgData='';prev.innerHTML='📸 الصورة ح تظهر هنا';render();alert('✅ تم النشر! منتجك ظهر هسي في طلبك');
+}
+function del(i){if(confirm('تحذف؟')){all.splice(i,1);localStorage.setItem('talabak_products',JSON.stringify(all));localStorage.setItem('talabak_global',JSON.stringify(all));render();}}
+render();
+</script>
+</body></html>
