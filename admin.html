@@ -1,0 +1,21 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة المسوقين</title>
+<style>body{font-family:sans-serif;padding:20px;background:#f5f5f5}.card{background:#fff;padding:15px;margin:10px 0;border-radius:10px}button{padding:8px 15px;margin:5px;border:none;border-radius:5px;cursor:pointer}.ok{background:#25D366;color:#fff}.del{background:red;color:#fff}</style></head><body>
+<script>
+let pass=prompt('ادخل كلمة السر');
+if(pass!=='1234'){document.body.innerHTML='<h2>كلمة سر خطأ</h2>';throw '';}
+</script>
+<h2>لوحة التحكم - المسوقين</h2>
+<div id="list"></div>
+<script>
+function load(){
+let marketers=JSON.parse(localStorage.getItem('marketers')||'[]');
+let div=document.getElementById('list');div.innerHTML='';
+if(marketers.length==0)div.innerHTML='لا يوجد طلبات';
+marketers.forEach((m,i)=>{
+div.innerHTML+=`<div class="card"><b>${m.name}</b> - ${m.phone}<br>الكود: ${m.code}<br>الحالة: ${m.approved?'✅ موافق عليه':'⏳ انتظار'}<br>رابطه:?ref=${m.code}<br><button class="ok" onclick="approve(${i})">موافقة</button><button class="del" onclick="removeM(${i})">حذف</button></div>`;
+});
+}
+function approve(i){let a=JSON.parse(localStorage.getItem('marketers'));a[i].approved=true;localStorage.setItem('marketers',JSON.stringify(a));load();}
+function removeM(i){if(confirm('حذف؟')){let a=JSON.parse(localStorage.getItem('marketers'));a.splice(i,1);localStorage.setItem('marketers',JSON.stringify(a));load();}}
+load();
+</script></body></html>
