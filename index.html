@@ -1,15 +1,45 @@
-<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>طلبك - السوق</title>
-<style>body{font-family:sans-serif;background:#f8f9fa;margin:0}header{background:#25D366;color:white;padding:15px;text-align:center} .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:15px} .card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1)} .card img{width:100%;height:130px;object-fit:cover} .card div{padding:8px}</style>
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>طلبك - سوق أمدرمان</title>
+<style>
+body{font-family:sans-serif;background:#f8f9fa;margin:0}
+header{background:#2e9d4a;color:white;padding:15px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+header .brand{display:flex;align-items:center;gap:10px}
+header img{width:45px;height:45px;background:white;border-radius:10px;padding:3px}
+.search{padding:15px}
+.search input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:15px}
+.card{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.card img{width:100%;height:135px;object-fit:cover}
+.card div{padding:10px}
+</style>
 </head><body>
-<header><h2>🛒 طلبك - سوق أمدرمان</h2><a href="login.html" style="color:white">+ سجل متجرك</a></header>
+<header>
+<div class="brand"><img src="logo.png" onerror="this.style.display='none'"><div><b style="font-size:22px">طلبك</b><br><small>Talabak - أمدرمان</small></div></div>
+<a href="login.html" style="color:white;background:#ffffff33;padding:8px 12px;border-radius:8px;text-decoration:none">+ متجري</a>
+</header>
+
+<div class="search"><input id="q" oninput="search()" placeholder="🔍 ابحث عن منتج، عيش، خضار، لبن..."></div>
 <div class="grid" id="grid"></div>
+
 <script src="firebase.js"></script>
 <script>
+let allProds=[], allStores=[], map={};
 async function loadMarket(){
- let prods = await FirebaseDB.getProducts();
- let stores = await FirebaseDB.getStores();
- let map={}; stores.forEach(s=>map[s._id]=s.name);
- document.getElementById("grid").innerHTML = prods.map(p=>`<div class="card"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/150'"><div><b>${p.name}</b><br>${p.price} SDG<br><small>🏪 ${map[p.storeId]||'متجر'}</small><br><a href="https://wa.me/${(stores.find(s=>s._id===p.storeId)||{}).phone||''}?text=عايز ${p.name}" target="_blank" style="background:#25D366;color:white;padding:5px 10px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:5px">اطلب واتساب</a></div></div>`).join("") || "<p>لا يوجد منتجات بعد</p>";
+ allProds = await FirebaseDB.getProducts();
+ allStores = await FirebaseDB.getStores();
+ allStores.forEach(s=>map[s._id]=s);
+ render(allProds);
+}
+function render(list){
+ document.getElementById("grid").innerHTML = list.map(p=>{
+  let s = map[p.storeId]||{};
+  return `<div class="card"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/300?text=طلبك'"><div><b>${p.name}</b><br><span style="color:#2e9d4a;font-weight:bold">${p.price} SDG</span><br><small>🏪 ${s.name||'متجر'}</small><br><a href="https://wa.me/${s.phone||''}?text=السلام عليكم، عايز ${p.name} من طلبك" target="_blank" style="background:#25D366;color:white;padding:6px 12px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:6px;width:90%;text-align:center">اطلب واتساب</a></div></div>`
+ }).join("") || "<p style='padding:20px'>لا يوجد منتجات. كن اول تاجر!</p>";
+}
+function search(){
+ let t = q.value.toLowerCase();
+ let f = allProds.filter(p=> p.name.toLowerCase().includes(t));
+ render(f);
 }
 loadMarket();
 </script></body></html>
