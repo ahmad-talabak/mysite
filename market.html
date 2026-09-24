@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>لوحة المسوق</title>
+<style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;padding:15px}h2{color:#00ff88}.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:12px 0}input{width:100%;background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;margin:6px 0}.btn{background:#00ff88;color:#000;border:none;padding:12px;border-radius:12px;font-weight:800;width:100%;cursor:pointer}.linkbox{background:#000;border:1px dashed #00ff88;padding:12px;border-radius:10px;word-break:break-all;margin:8px 0}</style></head><body>
+<h2>💰 لوحة المسوق</h2>
+<div class="card"><p>اكتب اسمك (بالانجليزي بدون مسافات)</p><input id="mname" placeholder="مثلا: ali20"><button class="btn" onclick="gen()">انشاء رابطي الخاص</button><div id="out"></div></div>
+<div class="card"><h3>كيف تربح؟</h3><p style="color:#888;font-size:14px;line-height:1.6">1. انسخ رابطك<br>2. انشرو في فيسبوك واتساب تيك توك<br>3. اي زبون يطلب من رابطك، الرسالة بتجيني انا فيها اسمك<br>4. انا بحول ليك عمولتك بنكك<br>مثال عمولة المنتج 500ج</p></div>
+<script>
+function gen(){
+ let n=document.getElementById('mname').value.trim().replace(/\s+/g,'');
+ if(!n) return alert('اكتب اسمك');
+ let link=`https://ahmad-talabak.github.io/mysite/?ref=${n}`;
+ out.innerHTML=`<div style="margin-top:12px">✅ رابطك جاهز:<div class="linkbox">${link}</div><button class="btn" onclick="navigator.clipboard.writeText('${link}');alert('اتنسخ')">📋 نسخ الرابط</button><a href="${link}" target="_blank" style="display:block;text-align:center;margin-top:10px;color:#00ff88">فتح متجري برابطك</a></div>`;
+}
+</script>
+</body></html>
