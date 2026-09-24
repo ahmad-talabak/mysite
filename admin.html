@@ -1,31 +1,63 @@
-<!DOCTYPE html>
-<html dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>لوحة التحكم</title>
-<style>body{background:#0a0a0a;color:white;padding:20px;font-family:sans-serif}input{width:90%;padding:12px;margin:5px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:white}button{padding:12px 20px;border-radius:10px;border:0;font-weight:bold;cursor:pointer;margin:5px}.card{background:#1a1a1a;border:1px solid #333;border-radius:15px;padding:10px;margin:10px 0;display:flex;gap:10px;align-items:center}img{width:60px;height:60px;border-radius:10px;object-fit:cover}
-#login{max-width:350px;margin:80px auto;text-align:center;background:#1a1a1a;padding:30px;border-radius:20px;border:1px solid #333}
-</style></head><body>
-<div id="login">
+<!DOCTYPE html><html dir=rtl><head><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1"><title>Admin TALABAK</title>
+<style>body{background:#0a0a0a;color:#fff;padding:15px;font-family:sans-serif}input{width:90%;padding:13px;margin:5px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:#fff}button{padding:12px 15px;border-radius:10px;border:0;font-weight:bold;cursor:pointer;margin:3px}.card{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:12px;margin:8px 0}.box{max-width:400px;margin:60px auto;background:#1a1a1a;padding:25px;border-radius:20px;border:1px solid #333;text-align:center}.tab{display:flex;gap:5px;margin:15px 0}.tab button{flex:1;background:#222;color:#fff}.tab button.active{background:#ff0080}</style>
+</head><body>
+<div class=box id=login>
 <h2>🔒 دخول خاص</h2>
-<input id="u" placeholder="Ahmed"><br>
-<input id="pw" type="password" placeholder="كلمة المرور"><br>
+<input id=u value="Ahmed"><br><input id=pw type=text value="159357@"><br>
 <button onclick="check()" style="background:#ff0080;color:white;width:95%">دخول</button>
-<p id="err" style="color:#ff4444"></p>
+<p id=err style="color:#f44"></p>
 </div>
-<div id="panel" style="display:none">
-<h1>⚙️ TALABAK ADMIN</h1>
-<input id="n" placeholder="اسم المنتج"><br>
-<input id="p" placeholder="السعر"><br>
-<input id="img" placeholder="رابط الصورة"><br>
+<div id=panel style="display:none">
+<h2>⚙️ TALABAK ADMIN</h2>
+<div class=tab>
+<button id=t1 class=active onclick="showTab('prod')">📦 المنتجات</button>
+<button id=t2 onclick="showTab('mos')">💼 المسوقين (<span id=cnt>0</span>)</button>
+</div>
+
+<div id=prodTab>
+<input id=n placeholder="اسم المنتج"><br><input id=pr placeholder="السعر"><br><input id=img placeholder="رابط الصورة"><br>
 <button onclick="add()" style="background:#00ff88;width:95%">+ اضافة</button>
-<hr><div id="list"></div>
-<button onclick="save()" style="background:#25D366;width:95%">💾 حفظ</button>
-<button onclick="localStorage.clear();location.reload()" style="background:#333;width:95%">خروج</button>
+<div id=list></div>
+<button onclick="save()" style="background:#25D366;width:95%">💾 حفظ المنتجات</button>
+</div>
+
+<div id=mosTab style="display:none">
+<h3>طلبات المسوقين</h3>
+<div id=mosList></div>
+<button onclick="clearMos()" style="background:#333;width:95%">مسح الكل</button>
+</div>
+
+<button onclick="localStorage.clear();location.reload()" style="background:#222;width:95%;margin-top:20px">خروج</button>
 </div>
 <script>
-function check(){if(document.getElementById('u').value=="Ahmed" && document.getElementById('pw').value=="159357@"){localStorage.setItem('auth','1');document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block';render();}else{document.getElementById('err').innerText="خطأ!";}}
+function check(){let u=document.getElementById('u').value.trim(),p=document.getElementById('pw').value.trim();if(u==="Ahmed"&&p==="159357@"){localStorage.setItem('auth','1');document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block';loadAll();}else{document.getElementById('err').innerText="خطأ في "+u+" / "+p;}}
 if(localStorage.getItem('auth')=="1"){document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block';}
+function showTab(t){document.getElementById('prodTab').style.display=t==='prod'?'block':'none';document.getElementById('mosTab').style.display=t==='mos'?'block':'none';document.getElementById('t1').className=t==='prod'?'active':'';document.getElementById('t2').className=t==='mos'?'active':'';if(t==='mos')renderMos();}
+
 let items=JSON.parse(localStorage.getItem('talabak')||"[]");
-function render(){document.getElementById('list').innerHTML=items.map((x,i)=>`<div class="card"><img src="${x.img}"><div style="flex:1"><b>${x.n}</b><br><small style="color:#00ff88">${x.p}</small></div><button onclick="items.splice(${i},1);render()" style="background:#ff4444">حذف</button></div>`).join('');}
-function add(){let n=document.getElementById('n').value,p=document.getElementById('p').value,img=document.getElementById('img').value||"https://via.placeholder.com/300";if(!n||!p)return alert("اكتب الاسم والسعر");items.push({n,p,img});render();document.getElementById('n').value="";document.getElementById('p').value="";}
-function save(){localStorage.setItem('talabak',JSON.stringify(items));alert("تم ✅ افتح المتجر");}
-</script>
-</body></html>
+function loadAll(){render();renderMos();}
+function render(){document.getElementById('list').innerHTML=items.map((x,i)=>`<div class=card><b>${x.n}</b> - ${x.p} <button onclick="items.splice(${i},1);render()" style="background:#f44">حذف</button></div>`).join('');}
+function add(){let n=document.getElementById('n').value,pr=document.getElementById('pr').value,img=document.getElementById('img').value||"https://via.placeholder.com/300";if(!n||!pr)return alert("اكتب");items.push({n,p:pr,img});render();}
+function save(){localStorage.setItem('talabak',JSON.stringify(items));alert("تم حفظ المنتجات");}
+
+function renderMos(){
+let mos=JSON.parse(localStorage.getItem('mosawigin')||"[]");
+document.getElementById('cnt').innerText=mos.length;
+if(mos.length==0){document.getElementById('mosList').innerHTML="<p style='color:#888'>لا يوجد طلبات بعد. شارك رابط: <br> ahmad-talabak.github.io/mysite/mosawig.html</p>";return;}
+document.getElementById('mosList').innerHTML=mos.map((m,i)=>`
+<div class=card>
+<b>👤 ${m.name}</b><br>📱 ${m.phone}<br>📍 ${m.city||''}<br><small>${m.exp||''}</small><br><small style="color:#888">${m.date}</small><br><br>
+<button onclick="accept(${i})" style="background:#25D366">✅ قبول وارسال رسالة</button>
+<button onclick="delMos(${i})" style="background:#f44">❌ رفض</button>
+</div>`).join('');
+}
+function accept(i){
+let mos=JSON.parse(localStorage.getItem('mosawigin')||"[]");
+let m=mos[i];
+let text=`مبروك يا ${m.name} تم قبولك كمسوق في TALABAK ✅%0A%0Aرابط متجرك الخاص قريبا سيصلك%0Aابدأ البيع واربح عمولتك 💰`;
+window.open(`https://wa.me/${m.phone.replace(/[^0-9]/g,'')}?text=${text}`,"_blank");
+}
+function delMos(i){let mos=JSON.parse(localStorage.getItem('mosawigin')||"[]");mos.splice(i,1);localStorage.setItem('mosawigin',JSON.stringify(mos));renderMos();}
+function clearMos(){if(confirm("متأكد تمسح كل الطلبات؟")){localStorage.removeItem('mosawigin');renderMos();}}
+loadAll();
+</script></body></html>
