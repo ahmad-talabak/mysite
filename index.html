@@ -1,47 +1,36 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>سوق السودان - متجر التجار</title>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلبك - كل شي بطلبك</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}body{background:#0a0a0a;color:#fff}
-.header{background:#111;border-bottom:1px solid #222;padding:12px;text-align:center;position:sticky;top:0;z-index:10}
-.header h1{color:#ffaa00;font-size:20px}.nav{display:flex;gap:8px;justify-content:center;margin-top:8px}
-.nav a{background:#1a1a1a;color:#888;padding:6px 12px;border-radius:20px;font-size:12px;text-decoration:none;border:1px solid #222}
-.container{max-width:1100px;margin:0 auto;padding:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}
-.card{background:#151515;border:1px solid #222;border-radius:16px;overflow:hidden}
-.card-img{height:130px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:36px}
-.card-body{padding:10px}.title{font-size:13px;font-weight:700;height:34px;overflow:hidden}
-.vendor{font-size:10px;color:#00ff88;margin-top:4px}.price{color:#ffaa00;font-weight:800;margin-top:4px}
-.btn{width:100%;background:#ffaa00;color:#000;border:none;padding:10px;border-radius:10px;font-weight:800;margin-top:6px;cursor:pointer;font-size:13px}
-.search{width:100%;background:#151515;border:1px solid #222;color:#fff;padding:11px;border-radius:10px;margin:10px 0}
-</style></head><body>
+*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;margin:0}
+.header{background:linear-gradient(135deg,#ffaa00,#ff6a00);padding:25px 15px;text-align:center}
+.header h1{margin:0;font-size:32px;color:#000}.header p{margin:5px 0 0;color:#000;font-weight:700}
+.container{max-width:700px;margin:0 auto;padding:15px}
+.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:10px 0}
+.btn{background:#ffaa00;color:#000;border:none;padding:12px 18px;border-radius:10px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prod{background:#111;border:1px solid #222;border-radius:12px;padding:10px;text-align:center}
+.prod b{display:block;margin:6px 0}
+</style></head>
+<body>
 <div class="header">
-<h1>🛒 سوق السودان المفتوح</h1>
-<div class="nav"><a href="./vendors.html">🏪 انضم كتاجر</a><a href="./market.html">💰 كن مسوق</a></div>
+<h1>🛒 طلبك</h1>
+<p>اطلب اي شي - يجيك لحد عندك</p>
 </div>
 <div class="container">
-<input id="search" class="search" placeholder="🔍 ابحث عن منتج..." oninput="filter()">
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<span>🏪 عندك محل؟</span><a class="btn" href="vendors.html">سجل محلك</a>
+</div>
+<div class="card">
+<h3 style="color:#ffaa00;margin:0 0 10px">🔥 منتجات طلبك</h3>
 <div id="products" class="grid">جاري التحميل...</div>
 </div>
+</div>
 <script>
-let all=[];
-async function load(){
- try{let r=await fetch('./products.json?v='+Date.now()); all=await r.json(); render(all);}catch(e){document.getElementById('products').innerHTML='لا يوجد منتجات';}
-}
-function render(list){
- if(!list.length){document.getElementById('products').innerHTML='<p style=text-align:center;padding:40px;color:#555>لا يوجد منتجات بعد</p>';return;}
- document.getElementById('products').innerHTML=list.map(p=>`
-  <div class="card"><div class="card-img">📦</div><div class="card-body">
-  <div class="title">${p.name}</div>
-  <div class="vendor">🏪 ${p.vendor||'المتجر الرئيسي'}</div>
-  <div class="price">${p.sell} ج</div>
-  <button class="btn" onclick="order('${p.name.replace(/'/g,"\\'")}',${p.sell},'${(p.vendor||'').replace(/'/g,"\\'")}')">اطلب واتساب</button>
-  </div></div>`).join('');
-}
-function filter(){let q=search.value.toLowerCase(); render(all.filter(p=>p.name.toLowerCase().includes(q)));}
-function order(name,price,vendor){
- let v=vendor? `%0A🏪 التاجر: ${vendor}`:'';
- let msg=`طلب شراء:%0A📦 ${encodeURIComponent(name)}%0A💵 ${price}ج${v}%0A%0Aاسمي:%0Aرقمي:%0Aعنواني:`;
- window.open(`https://wa.me/249124341697?text=${msg}`,'_blank');
-}
-load();
+fetch('products.json').then(r=>r.json()).then(data=>{
+let c=document.getElementById('products');
+if(!data.length) c.innerHTML='<p style=color:#666>لا يوجد منتجات حاليا - التجار بيسجلو</p>';
+else c.innerHTML=data.map(p=>`<div class="prod"><b>${p.name}</b><small>🏬 ${p.vendor||p.shopName||'طلبك'}</small><br><span style=color:#ffaa00;font-weight:800>${p.sell||p.price}ج</span><br><a class="btn" style="margin-top:6px;padding:8px 12px;font-size:13px" href="https://wa.me/249000000000?text=اريد ${encodeURIComponent(p.name)}">اطلب واتساب</a></div>`).join('');
+}).catch(()=>{document.getElementById('products').innerHTML='لا يوجد products.json بعد - اضف من admin.html'});
 </script>
 </body></html>
