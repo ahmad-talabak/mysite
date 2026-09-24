@@ -1,43 +1,36 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>لوحة الادمن</title><style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;margin:0;padding:10px}.box{max-width:750px;margin:auto}.card{background:#151515;border:1px solid #222;border-radius:12px;padding:14px;margin:8px 0}h2{color:#ffaa00;margin:0}input{background:#000;border:1px solid #333;color:#fff;padding:10px;border-radius:8px}.btn{background:#ffaa00;color:#000;border:none;padding:8px 12px;border-radius:8px;font-weight:900;cursor:pointer}.btn2{background:#222;color:#fff;border:1px solid #333;padding:8px 12px;border-radius:8px;cursor:pointer}.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.b{background:#000;border:1px solid #222;border-radius:8px;padding:10px;text-align:center}.b b{color:#ffaa00;display:block}.merchant{border:1px solid #333;border-radius:10px;padding:10px;margin:6px 0;background:#111}.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:900}.ok{background:#0a3;color:#fff}.no{background:#a30;color:#fff}.wait{background:#a80;color:#000}</style></head><body><div class="box">
-<div class="card"><h2>👑 لوحة الادمن - طلبك</h2><p style="color:#666;font-size:11px">باسورد: 1234</p><input id="adminPass" type="password" placeholder="1234"><button class="btn" onclick="check()">دخول</button></div>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ارباح الادمن</title><style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;margin:0;padding:10px}.box{max-width:750px;margin:auto}.card{background:#151515;border:1px solid #222;border-radius:12px;padding:14px;margin:8px 0}input{background:#000;border:1px solid #333;color:#fff;padding:10px;border-radius:8px}.btn{background:#ffaa00;color:#000;border:none;padding:8px 12px;border-radius:8px;font-weight:900;cursor:pointer}.btn2{background:#222;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.b{background:#000;border:1px solid #222;border-radius:10px;padding:10px;text-align:center}.b b{display:block;font-size:15px}.merchant{border:1px solid #333;border-radius:10px;padding:10px;margin:6px 0;background:#111}.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:900}.ok{background:#0a3;color:#fff}.no{background:#a30;color:#fff}.wait{background:#a80;color:#000}</style></head><body><div class="box">
+<div class="card"><h2 style="color:#ffaa00;margin:0">👑 لوحة الارباح - انت الادمن</h2><p style="color:#666;font-size:11px">شايف ارباحك وارباح كل تاجر</p><input id="adminPass" type="password" placeholder="باسورد 1234"><button class="btn" onclick="check()">دخول</button></div>
 <div id="panel" style="display:none">
-<div class="card"><div class="grid"><div class="b"><small>التجار</small><b id="a1">0</b></div><div class="b"><small>منتظرين</small><b id="a2">0</b></div><div class="b"><small>المنتجات</small><b id="a3">0</b></div><div class="b"><small>عمولتك</small><b id="a4">0ج</b></div></div></div>
-<div class="card"><h3>🏪 التجار - اقبل وارفض</h3><div id="merch"></div></div>
-<div class="card"><h3>📦 منتجات - شوف المتجر</h3><div id="prods"></div></div>
+<div class="card"><h3 style="margin:0 0 8px">💰 ارباحك انت</h3><div class="grid"><div class="b"><small>كل التجار</small><b id="a1" style="color:#fff">0</b></div><div class="b"><small>كل المنتجات</small><b id="a2" style="color:#fff">0</b></div><div class="b"><small>عمولتك 10%</small><b id="a3" style="color:#ffaa00">0ج</b></div><div class="b"><small>اجمالي المبيعات</small><b id="a4" style="color:#0f5">0ج</b></div></div></div>
+<div class="card"><h3>🏪 ارباح كل تاجر براهو</h3><div id="merch"></div></div>
 </div></div>
 <script>
-let ok=false;
-function check(){if(adminPass.value=='1234'){ok=true;panel.style.display='block';render()}else alert('غلط - 1234');}
+function check(){if(adminPass.value=='1234'){panel.style.display='block';render()}else alert('1234');}
 function render(){
  let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');
  let all=JSON.parse(localStorage.getItem('talabak_global')||'[]');
- a1.innerText=ms.length;
- a2.innerText=ms.filter(m=>m.status!='approved').length;
- a3.innerText=all.length;
- a4.innerText=all.reduce((a,b)=>a+(+b.profit||0)*0.1,0).toFixed(0)+'ج';
+ a1.innerText=ms.length;a2.innerText=all.length;
+ let totalProfit=all.reduce((a,b)=>a+(+b.profit||0),0);
+ let myCommission=totalProfit*0.1;
+ let totalSell=all.reduce((a,b)=>a+(+b.sell||0),0);
+ a3.innerText=myCommission.toFixed(0)+'ج';a4.innerText=totalSell+'ج';
  merch.innerHTML=ms.map(m=>{
   let mine=all.filter(x=>x.merchantId==m.id);
+  let tp=mine.reduce((a,b)=>a+(+b.profit||0),0);
+  let ts=mine.reduce((a,b)=>a+(+b.sell||0),0);
+  let tc=mine.reduce((a,b)=>a+(+b.cost||0),0);
   let st=m.status||'pending';
-  let badge=st=='approved'?'<span class=badge-ok>✅ مقبول</span>':st=='rejected'?'<span class=badge-no>❌ مرفوض</span>':'<span class=badge-wait>⏳ منتظر</span>';
   let badgeClass=st=='approved'?'ok':st=='rejected'?'no':'wait';
   return `<div class="merchant">
-   <div style="display:flex;justify-content:space-between;align-items:center">
-    <div><b>${m.shop}</b><br><small style="color:#888">${m.phone} | ${m.id}</small> <span class="badge ${badgeClass}">${st=='approved'?'مقبول':st=='rejected'?'مرفوض':'منتظر'}</span></div>
-    <div><small style="color:#ffaa00">${mine.length} منتج</small></div>
-   </div>
-   <div style="display:flex;gap:5px;margin-top:8px">
-    <button class="btn" onclick="approve('${m.id}')">✅ قبول</button>
-    <button class="btn2" onclick="reject('${m.id}')" style="background:#400;border-color:#600;color:#f88">❌ رفض</button>
-    <button class="btn2" onclick="viewStore('${m.id}')">👁️ شوف المتجر</button>
-    <button class="btn2" onclick="delM('${m.id}')">🗑️ حذف</button>
-   </div>
-   <div id="store-${m.id}" style="display:none;margin-top:8px;background:#000;border:1px solid #222;border-radius:8px;padding:8px"></div>
+   <div style="display:flex;justify-content:space-between"><div><b>${m.shop}</b> <span class="badge ${badgeClass}">${st}</span><br><small style="color:#888">${m.phone} | ${mine.length} منتج</small></div><div style="text-align:left"><small style="color:#888">ربح التاجر صافي</small><br><b style="color:#0f5">${(tp*0.9).toFixed(0)}ج</b><br><small style="color:#ffaa00">عمولتك: ${(tp*0.1).toFixed(0)}ج</small></div></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px;font-size:11px"><div style="background:#000;padding:6px;border-radius:6px;text-align:center">مبيعات<br><b>${ts}ج</b></div><div style="background:#000;padding:6px;border-radius:6px;text-align:center">راس مال<br><b style="color:#f55">${tc}ج</b></div><div style="background:#000;padding:6px;border-radius:6px;text-align:center">ربح كلي<br><b style="color:#ffaa00">${tp}ج</b></div></div>
+   <div style="display:flex;gap:4px;margin-top:8px"><button class="btn" onclick="approve('${m.id}')">✅ قبول</button><button class="btn2" style="background:#400;color:#f88" onclick="reject('${m.id}')">❌ رفض</button><button class="btn2" onclick="viewStore('${m.id}')">👁️ متجرو وارباحو</button><button class="btn2" onclick="delM('${m.id}')">حذف</button></div>
+   <div id="store-${m.id}" style="display:none;margin-top:8px;background:#000;border-radius:8px;padding:8px"></div>
   </div>`;
- }).join('')||'<p style=color:#555>لا يوجد تجار</p>';
- prods.innerHTML=all.map(p=>`<div style="display:flex;gap:6px;align-items:center;background:#111;border:1px solid #222;border-radius:6px;padding:6px;margin:4px 0"><img src="${p.img}" style="width:40px;height:40px;border-radius:6px;object-fit:cover"><div style="flex:1"><b style="font-size:12px">${p.name}</b><br><small style="color:#888">${p.shopName} - ${p.sell}ج</small></div><button class="btn2" onclick="window.open('index.html?shop=${p.merchantId}','_blank')">متجر</button></div>`).join('');
+ }).join('')||'لا يوجد';
 }
-function approve(id){let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');let m=ms.find(x=>x.id==id);m.status='approved';localStorage.setItem('talabak_merchants',JSON.stringify(ms));render();alert('تم قبول '+m.shop);}
-function reject(id){let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');let m=ms.find(x=>x.id==id);m.status='rejected';localStorage.setItem('talabak_merchants',JSON.stringify(ms));render();}
-function delM(id){if(!confirm('تحذف التاجر؟')) return;let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');let all=JSON.parse(localStorage.getItem('talabak_global')||'[]');localStorage.setItem('talabak_merchants',JSON.stringify(ms.filter(m=>m.id!=id)));localStorage.setItem('talabak_global',JSON.stringify(all.filter(p=>p.merchantId!=id)));render();}
-function viewStore(mid){let all=JSON.parse(localStorage.getItem('talabak_global')||'[]');let mine=all.filter(x=>x.merchantId==mid);let div=document.getElementById('store-'+mid);div.style.display=div.style.display=='none'?'block':'none';div.innerHTML=mine.length?mine.map(p=>`<div style="display:flex;gap:6px;margin:3px 0"><img src="${p.img}" style="width:30px;height:30px;border-radius:4px"><small>${p.name} - ${p.sell}ج - ربح ${p.profit}ج</small></div>`).join(''):'<small style=color:#666>لا يوجد منتجات</small>';}
+function approve(id){let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');ms.find(x=>x.id==id).status='approved';localStorage.setItem('talabak_merchants',JSON.stringify(ms));render();}
+function reject(id){let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');ms.find(x=>x.id==id).status='rejected';localStorage.setItem('talabak_merchants',JSON.stringify(ms));render();}
+function delM(id){if(!confirm('تحذف؟')) return;let ms=JSON.parse(localStorage.getItem('talabak_merchants')||'[]');let all=JSON.parse(localStorage.getItem('talabak_global')||'[]');localStorage.setItem('talabak_merchants',JSON.stringify(ms.filter(m=>m.id!=id)));localStorage.setItem('talabak_global',JSON.stringify(all.filter(p=>p.merchantId!=id)));render();}
+function viewStore(mid){let all=JSON.parse(localStorage.getItem('talabak_global')||'[]');let mine=all.filter(x=>x.merchantId==mid);let div=document.getElementById('store-'+mid);div.style.display=div.style.display=='none'?'block':'none';div.innerHTML=mine.map(p=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #111;font-size:11px"><span>${p.name}</span><span>${p.cost} → ${p.sell} = <b style="color:#0f5">${p.profit}ج</b> (ليك ${(p.profit*0.1).toFixed(0)}ج)</span></div>`).join('')||'فاضي';}
 </script></body></html>
