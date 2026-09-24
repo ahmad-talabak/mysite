@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>انضم كتاجر</title>
+<style>*{box-sizing:border-box;font-family:system-ui}body{background:#0a0a0a;color:#fff;padding:15px}h2{color:#ffaa00}.card{background:#151515;border:1px solid #222;border-radius:15px;padding:15px;margin:12px 0}input,textarea{width:100%;background:#000;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;margin:6px 0}.btn{background:#ffaa00;color:#000;border:none;padding:12px;border-radius:12px;font-weight:800;width:100%;cursor:pointer}</style></head><body>
+<h2>🏪 انضم كتاجر - انشر بضاعتك مجانا</h2>
+<div class="card">
+<p style="color:#888;font-size:13px">املى بياناتك وبضاعتك وانا بنشرها ليك في المتجر، انت تبيع وانا بشيل عمولة بسيطة</p>
+<input id="tname" placeholder="اسمك / اسم المحل">
+<input id="tphone" placeholder="رقم واتسابك">
+<input id="pname" placeholder="اسم المنتج">
+<input id="pcost" type="number" placeholder="سعرك انت داير تبيع بيهو (مثلا 10000)">
+<textarea id="pdesc" placeholder="وصف المنتج"></textarea>
+<input id="pcomm" type="number" placeholder="عمولتي انا صاحب المتجر (مثلا 1000)">
+<button class="btn" onclick="send()">📤 ارسل طلب نشر المنتج</button>
+</div>
+<script>
+function send(){
+ let t=tname.value, ph=tphone.value, pn=pname.value, pc=pcost.value, pd=pdesc.value, com=pcomm.value;
+ if(!t||!ph||!pn||!pc) return alert('املى كل البيانات');
+ let msg=`طلب انضمام تاجر جديد:%0A🏪 التاجر: ${t}%0A📱 رقمو: ${ph}%0A📦 المنتج: ${pn}%0A💰 سعر التاجر: ${pc}%0A📝 الوصف: ${pd}%0A💸 عمولة المتجر: ${com}%0A%0Aوافق وانشرو`;
+ window.open(`https://wa.me/249124341697?text=${encodeURIComponent(msg).replace(/%250A/g,'%0A')}`,'_blank');
+}
+</script>
+</body></html>

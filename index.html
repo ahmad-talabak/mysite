@@ -1,67 +1,47 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>متجري</title>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>سوق السودان - متجر التجار</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
-body{background:#0a0a0a;color:#fff}
-.header{background:#111;border-bottom:1px solid #222;padding:15px;text-align:center;position:sticky;top:0;z-index:10}
-.header h1{color:#ffaa00}
-.container{max-width:1100px;margin:0 auto;padding:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
-.card{background:#151515;border:1px solid #222;border-radius:18px;overflow:hidden}
-.card-img{height:130px;background:#1e1e1e;display:flex;align-items:center;justify-content:center;font-size:36px}
-.card-body{padding:12px}
-.card-title{font-size:14px;font-weight:700;height:36px;overflow:hidden}
-.price{color:#ffaa00;font-weight:800}
-.badge{background:#00ff88;color:#000;font-size:10px;padding:3px 7px;border-radius:20px}
-.btn{width:100%;background:#ffaa00;color:#000;border:none;padding:11px;border-radius:12px;font-weight:800;margin-top:8px;cursor:pointer}
-.search{width:100%;background:#151515;border:1px solid #222;color:#fff;padding:12px;border-radius:12px;margin:12px 0}
-.refbox{background:#111;border:1px dashed #ffaa00;border-radius:12px;padding:12px;margin:10px 0;text-align:center;display:none}
-</style>
-</head>
-<body>
-<div class="header"><h1>🛒 متجري</h1><p id="refInfo">توصيل لكل السودان</p></div>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}body{background:#0a0a0a;color:#fff}
+.header{background:#111;border-bottom:1px solid #222;padding:12px;text-align:center;position:sticky;top:0;z-index:10}
+.header h1{color:#ffaa00;font-size:20px}.nav{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.nav a{background:#1a1a1a;color:#888;padding:6px 12px;border-radius:20px;font-size:12px;text-decoration:none;border:1px solid #222}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}
+.card{background:#151515;border:1px solid #222;border-radius:16px;overflow:hidden}
+.card-img{height:130px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:36px}
+.card-body{padding:10px}.title{font-size:13px;font-weight:700;height:34px;overflow:hidden}
+.vendor{font-size:10px;color:#00ff88;margin-top:4px}.price{color:#ffaa00;font-weight:800;margin-top:4px}
+.btn{width:100%;background:#ffaa00;color:#000;border:none;padding:10px;border-radius:10px;font-weight:800;margin-top:6px;cursor:pointer;font-size:13px}
+.search{width:100%;background:#151515;border:1px solid #222;color:#fff;padding:11px;border-radius:10px;margin:10px 0}
+</style></head><body>
+<div class="header">
+<h1>🛒 سوق السودان المفتوح</h1>
+<div class="nav"><a href="./vendors.html">🏪 انضم كتاجر</a><a href="./market.html">💰 كن مسوق</a></div>
+</div>
 <div class="container">
-<div id="refBox" class="refbox">👋 مرحب! انت داخل عن طريق المسوق: <b id="refName" style="color:#00ff88"></b></div>
-<input id="search" class="search" placeholder="🔍 ابحث..." oninput="filterProducts()">
+<input id="search" class="search" placeholder="🔍 ابحث عن منتج..." oninput="filter()">
 <div id="products" class="grid">جاري التحميل...</div>
 </div>
 <script>
-let allProducts=[]; let currentRef='';
-function getRef(){let u=new URLSearchParams(location.search); return u.get('ref')||u.get('m')||'';}
+let all=[];
 async function load(){
- currentRef=getRef();
- if(currentRef){refBox.style.display='block';refName.innerText=currentRef;refInfo.innerText='طلبك ح يجي عبر المسوق: '+currentRef;}
- try{
-  let res=await fetch('./products.json?v='+Date.now());
-  allProducts=await res.json();
-  render(allProducts);
- }catch(e){document.getElementById('products').innerHTML='لا يوجد منتجات';}
+ try{let r=await fetch('./products.json?v='+Date.now()); all=await r.json(); render(all);}catch(e){document.getElementById('products').innerHTML='لا يوجد منتجات';}
 }
 function render(list){
+ if(!list.length){document.getElementById('products').innerHTML='<p style=text-align:center;padding:40px;color:#555>لا يوجد منتجات بعد</p>';return;}
  document.getElementById('products').innerHTML=list.map(p=>`
-  <div class="card">
-   <div class="card-img">📦</div>
-   <div class="card-body">
-    <div class="card-title">${p.name}</div>
-    <div style="display:flex;justify-content:space-between;margin-top:6px"><span class="price">${p.sell} ج</span><span class="badge">${p.comm? 'عمولة '+p.comm : 'متوفر'}</span></div>
-    <button class="btn" onclick="order('${p.name.replace(/'/g,"\\'")}',${p.sell},${p.comm||0})">اطلب واتساب</button>
-   </div>
-  </div>`).join('');
+  <div class="card"><div class="card-img">📦</div><div class="card-body">
+  <div class="title">${p.name}</div>
+  <div class="vendor">🏪 ${p.vendor||'المتجر الرئيسي'}</div>
+  <div class="price">${p.sell} ج</div>
+  <button class="btn" onclick="order('${p.name.replace(/'/g,"\\'")}',${p.sell},'${(p.vendor||'').replace(/'/g,"\\'")}')">اطلب واتساب</button>
+  </div></div>`).join('');
 }
-function filterProducts(){
- let q=document.getElementById('search').value.toLowerCase();
- render(allProducts.filter(p=>p.name.toLowerCase().includes(q)));
-}
-function order(name,price,comm){
- let refPart=currentRef? `%0A%0A🔗 *المسوق:* ${currentRef}%0A💰 *عمولته:* ${comm} ج` : '';
- let msg=`طلب جديد:%0A📦 *${encodeURIComponent(name)}*%0A💵 السعر: ${price} ج${refPart}%0A%0Aالاسم:%0Aالرقم:%0Aالعنوان:`;
+function filter(){let q=search.value.toLowerCase(); render(all.filter(p=>p.name.toLowerCase().includes(q)));}
+function order(name,price,vendor){
+ let v=vendor? `%0A🏪 التاجر: ${vendor}`:'';
+ let msg=`طلب شراء:%0A📦 ${encodeURIComponent(name)}%0A💵 ${price}ج${v}%0A%0Aاسمي:%0Aرقمي:%0Aعنواني:`;
  window.open(`https://wa.me/249124341697?text=${msg}`,'_blank');
 }
 load();
 </script>
-</body>
-</html>
+</body></html>
