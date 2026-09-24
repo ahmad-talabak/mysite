@@ -57,6 +57,14 @@ function addProduct(){
  let prod={id:Date.now(),name:name,cost:+p_cost.value||0,sell:+p_sell.value||0,comm:+p_comm.value||0,profit:(+p_sell.value - +p_cost.value - +p_comm.value)};
  products.push(prod); save(); p_name.value='';p_cost.value='';p_sell.value='';p_comm.value='';calc_profit.innerText='0';
 }
+function publishAll(){
+ let data=JSON.stringify(products,null,2);
+ let blob=new Blob([data],{type:'application/json'});
+ let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='products.json'; a.click();
+ alert('نزل ملف products.json - ارفعو في GitHub عشان يظهر للجميع\n\nاو انسخ الكود ده والصقو في index.html');
+ console.log(data);
+ prompt('انسخ ده:', data);
+}
 function save(){localStorage.setItem('products_db', JSON.stringify(products));localStorage.setItem('site_products', JSON.stringify(products));render();}
 function del(id){if(!confirm('تحذف؟'))return;products=products.filter(p=>p.id!=id);save();}
 function edit(id){let p=products.find(x=>x.id==id);let ns=prompt('سعر البيع الجديد',p.sell);if(ns==null)return;let nc=prompt('عمولة جديدة',p.comm);p.sell=+ns;p.comm=+(nc||p.comm);p.profit=p.sell-p.cost-p.comm;save();}
@@ -69,5 +77,5 @@ function render(){
 function approve(phone){let db=JSON.parse(localStorage.getItem('marketers_db')||'{"pending":[],"approved":[]}');db.approved.push(phone);db.pending=db.pending.filter(x=>x.phone!=phone);localStorage.setItem('marketers_db',JSON.stringify(db));render();}
 render();
 </script>
-</body>
+<div class="card"><button class="btn" onclick="publishAll()" style="background:#00ff88">📢 نشر المنتجات للجميع (تحميل ملف)</button><div class="small" style="margin-top:10px">بعد التحميل، ارسل لي الملف وانا بربطو ليك يظهر لكل الناس</div></div></body>
 </html>
